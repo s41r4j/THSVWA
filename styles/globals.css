@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+body {
+  @apply bg-hacksmith-dark text-white font-sans;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-hacksmith-gray;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-hacksmith-orange rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-orange-400;
+}
+
+/* Product card hover effects */
+.product-card {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.product-card:hover {
+  @apply transform scale-105 shadow-xl;
+  box-shadow: 0 10px 30px rgba(255, 122, 0, 0.2);
+}
+
+/* Button animations */
+.btn-primary {
+  @apply bg-hacksmith-orange text-black font-semibold px-6 py-3 rounded-lg transition-all duration-300;
+}
+
+.btn-primary:hover {
+  @apply bg-orange-400 transform scale-105;
+  box-shadow: 0 5px 15px rgba(255, 122, 0, 0.4);
+}
+
+.btn-secondary {
+  @apply border-2 border-hacksmith-orange text-hacksmith-orange font-semibold px-6 py-3 rounded-lg transition-all duration-300;
+}
+
+.btn-secondary:hover {
+  @apply bg-hacksmith-orange text-black transform scale-105;
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full px-4 py-3 bg-hacksmith-gray border border-gray-600 rounded-lg outline-none transition-all duration-300;
+}
+
+.input-field:focus {
+  @apply border-hacksmith-orange ring-2 ring-hacksmith-orange ring-opacity-20;
+}
+
+/* Card styles */
+.card {
+  @apply bg-hacksmith-gray border border-gray-700 rounded-xl p-6 shadow-lg;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-xl hover:border-hacksmith-orange;
+}

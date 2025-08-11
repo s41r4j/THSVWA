@@ -1,4 +1,5 @@
-# THSVWA – Hacksmith Shop Vulnerable Web Application
+# THSVWA
+> The Hacksmith Shop Vulnerable Web Application
 
 ## Project Overview
 
