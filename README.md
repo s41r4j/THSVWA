@@ -3,13 +3,30 @@
 
 ## Project Overview
 
-Hacksmith Shop is a deliberately vulnerable web application designed as an e-commerce-style platform for educational Capture The Flag (CTF) challenges. Built to simulate real-world web security flaws, it provides a safe environment to explore and understand common vulnerabilities.
+Hacksmith Shop is a deliberately vulnerable web application designed as a simple e-commerce-style platform for educational Capture The Flag (CTF) challenges. Built to simulate real-world web security flaws, it provides a safe environment to explore and understand common vulnerabilities.
+
+### Features
+
+- **Simple E-commerce UI**: Clean, responsive design with black and orange Hacksmith branding
+- **Three Core Pages**: Focused structure with main page, tools, and user management
+- **Interactive CTF Challenges**: Multiple vulnerability types with educational context
+- **Authentication System**: Login functionality with hardcoded test users
+- **Educational Content**: Built-in security warnings and vulnerability explanations
+
+### Application Structure
+
+The application consists of three main pages:
+
+1. **Main Page (/)**: Landing page displaying a list of blacksmithing tools with search functionality
+2. **Tools Page (/tools)**: Detailed tool information with product specifications
+3. **Login Page (/login)**: User authentication that redirects to profile
+4. **Profile Page (/profile)**: Simple user profile management (requires login)
 
 ### Development Workflow
 
 - Develop a simple, interactive "Hacksmith Shop" web application
 - Embed intentional security vulnerabilities for learning purposes
-- Provide a `/flag` endpoint for users to submit discovered flags
+- Maintain clean, minimal design while preserving educational value
 - Containerize the application using Docker for isolated, reproducible deployment
 
 ## Included Vulnerabilities
@@ -22,6 +39,27 @@ The application contains the following vulnerabilities, each hiding a flag for C
 - **Insecure File Upload**: Upload malicious files to access restricted areas or flags.
 - **Insecure Direct Object Reference (IDOR)**: Access unauthorized resources by manipulating identifiers.
 - **Local File Inclusion (LFI)**: Exploit file inclusion to read sensitive files containing flags.
+
+## UI Features
+
+### Modern E-commerce Design
+- **Responsive Layout**: Mobile-first design that works on all device sizes
+- **Professional Navigation**: Sticky header with smooth navigation and mobile menu
+- **Product Showcase**: Featured products carousel with ratings, pricing, and stock status
+- **Interactive Elements**: Hover effects, animations, and smooth transitions
+
+### Enhanced User Experience
+- **Search & Filter**: Advanced product filtering with category selection and sorting
+- **Product Details**: Comprehensive product pages with specifications and related items
+- **User Profile**: Complete profile management with real-time preview
+- **File Operations**: Professional file upload interface with drag-and-drop support
+- **Terminal Interface**: Realistic command execution terminal with syntax highlighting
+
+### Security Education
+- **Vulnerability Indicators**: Clear warnings about intentional security flaws
+- **CTF Hints**: Built-in hints and guidance for each challenge type
+- **Educational Content**: Explanations of vulnerabilities and their implications
+- **Progress Tracking**: Submission history and flag discovery tracking
 
 ## Setup Instructions
 

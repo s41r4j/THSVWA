@@ -1,184 +1,139 @@
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const heroSlides = [
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState('');
+
+  const products = [
     {
-      title: "Hacksmith Forge Collection",
-      subtitle: "Premium Black & Orange Tech Gear",
-      description: "Discover our exclusive range of engineering-inspired merchandise and tools."
+      id: 1,
+      name: 'Professional Hammer',
+      price: 89,
+      image: '/assets/hammer.png',
+      description: 'Heavy-duty forging hammer perfect for metalworking and blacksmithing projects.'
     },
     {
-      title: "CTF Challenge Ready",
-      subtitle: "Test Your Security Skills",
-      description: "Built with intentional vulnerabilities for educational purposes."
+      id: 2,
+      name: 'Steel Anvil',
+      price: 299,
+      image: '/assets/anvil.png',
+      description: 'Solid steel anvil for precise metalworking. Essential tool for any blacksmith.'
     },
     {
-      title: "Professional Grade Tools", 
-      subtitle: "For the Modern Hacker",
-      description: "From SQL injectors to XSS scripts - everything you need."
+      id: 3,
+      name: 'Heat-Resistant Gloves',
+      price: 45,
+      image: '/assets/gloves.png',
+      description: 'Premium heat-resistant gloves for safe handling of hot materials and tools.'
+    },
+    {
+      id: 4,
+      name: 'Forging Tongs',
+      price: 65,
+      image: '/assets/tongs.png',
+      description: 'Precision forging tongs for gripping and manipulating hot metal pieces.'
     }
   ];
 
-  const featuredProducts = [
-    { id: 1, name: 'Hacksmith Hoodie', price: 49, image: '🧥', category: 'Apparel' },
-    { id: 3, name: 'SQL Injector Pro', price: 299, image: '💉', category: 'Tools' },
-    { id: 4, name: 'XSS Scripter Elite', price: 399, image: '⚡', category: 'Tools' },
-    { id: 5, name: 'Command Blaster', price: 199, image: '💥', category: 'Tools' },
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  const handleSearch = () => {
+    // XSS Vulnerability - Direct HTML injection without sanitization
+    setSearchResults(`<p>Search results for: <strong>${search}</strong></p>
+    <p>Found ${products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).length} products</p>`);
+  };
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Carousel */}
-      <section className="relative h-96 md:h-[500px] overflow-hidden bg-gradient-to-r from-hacksmith-dark via-hacksmith-gray to-hacksmith-dark">
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-hacksmith-orange mb-4 animate-glow">
-              {heroSlides[currentSlide].title}
-            </h1>
-            <h2 className="text-xl md:text-2xl text-white mb-4 font-light">
-              {heroSlides[currentSlide].subtitle}
-            </h2>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              {heroSlides[currentSlide].description}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/shop" className="btn-primary inline-block">
-                Explore Collection
-              </Link>
-              <Link href="/flag" className="btn-secondary inline-block">
-                Submit Flag
-              </Link>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-hacksmith-dark via-hacksmith-gray to-hacksmith-dark py-16">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h1 className="text-5xl font-bold text-hacksmith-orange mb-4 animate-glow">
+            Hacksmith Tools
+          </h1>
+          <p className="text-xl text-gray-300 mb-8">
+            Professional blacksmithing and metalworking tools for craftsmen
+          </p>
+          
+          {/* Search Bar with XSS Vulnerability */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search tools... (Try: <script>alert('XSS')</script>)"
+                className="input-field flex-1"
+              />
+              <button onClick={handleSearch} className="btn-primary whitespace-nowrap">
+                Search
+              </button>
             </div>
+            
+            {/* XSS Vulnerability - Dangerous innerHTML */}
+            {searchResults && (
+              <div 
+                className="mt-4 p-4 bg-hacksmith-gray rounded-lg text-left"
+                dangerouslySetInnerHTML={{ __html: searchResults }}
+              />
+            )}
           </div>
-        </div>
-        
-        {/* Slide Indicators */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                currentSlide === index ? 'bg-hacksmith-orange' : 'bg-white/30'
-              }`}
-            />
-          ))}
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* Products Grid */}
       <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-hacksmith-orange mb-4">
-              Featured Products
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Discover our most popular items, carefully crafted for the modern hacksmith
-            </p>
-          </div>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-hacksmith-orange mb-8 text-center">
+            Our Tools
+          </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="product-card card card-hover group">
-                <div className="h-48 mb-4 rounded-lg bg-gradient-to-br from-hacksmith-gray to-hacksmith-light-gray flex items-center justify-center text-6xl">
-                  {product.image}
-                </div>
-                <div className="text-sm text-hacksmith-orange font-semibold mb-2">
-                  {product.category}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <Link 
+                key={product.id} 
+                href={`/tools?id=${product.id}`}
+                className="product-card card card-hover group"
+              >
+                <div className="h-48 mb-4 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
                 </div>
                 <h3 className="font-bold text-lg mb-2 group-hover:text-hacksmith-orange transition-colors">
                   {product.name}
                 </h3>
+                <p className="text-sm text-gray-400 mb-4 line-clamp-3">
+                  {product.description}
+                </p>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-hacksmith-orange">
                     ${product.price}
                   </span>
-                  <Link 
-                    href={`/item/${product.id}`} 
-                    className="bg-hacksmith-orange text-black px-4 py-2 rounded-lg font-semibold hover:bg-orange-400 transition-colors"
-                  >
-                    View
-                  </Link>
+                  <span className="text-sm text-hacksmith-orange hover:underline">
+                    View Details →
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 px-6 bg-hacksmith-gray">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-hacksmith-orange mb-4">
-              Why Choose Hacksmith Shop?
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-hacksmith-orange rounded-full flex items-center justify-center mx-auto mb-4 text-black text-2xl font-bold">
-                🔒
-              </div>
-              <h3 className="text-xl font-bold mb-3">Security Focused</h3>
-              <p className="text-gray-400">
-                Educational vulnerabilities built-in for learning and testing purposes
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-hacksmith-orange rounded-full flex items-center justify-center mx-auto mb-4 text-black text-2xl font-bold">
-                ⚡
-              </div>
-              <h3 className="text-xl font-bold mb-3">High Performance</h3>
-              <p className="text-gray-400">
-                Professional-grade tools designed for modern cybersecurity professionals
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-hacksmith-orange rounded-full flex items-center justify-center mx-auto mb-4 text-black text-2xl font-bold">
-                🎯
-              </div>
-              <h3 className="text-xl font-bold mb-3">CTF Ready</h3>
-              <p className="text-gray-400">
-                Perfect for Capture The Flag competitions and security training
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-16 px-6">
+      {/* Security Notice */}
+      <section className="py-8 px-6 bg-hacksmith-gray">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-hacksmith-orange mb-4">
-            Stay Updated
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Subscribe to get the latest updates on new tools and security challenges
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="input-field flex-1"
-            />
-            <button className="btn-primary whitespace-nowrap">
-              Subscribe
-            </button>
+          <div className="card bg-red-900/20 border-red-500">
+            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠️ Security Notice</h3>
+            <p className="text-sm text-red-300">
+              This application contains intentional vulnerabilities for educational purposes:
+            </p>
+            <ul className="text-sm text-red-300 mt-2 space-y-1">
+              <li>• XSS vulnerability in search functionality</li>
+              <li>• IDOR vulnerability in product URLs</li>
+              <li>• LFI vulnerability in product details</li>
+            </ul>
           </div>
         </div>
       </section>

@@ -6,11 +6,8 @@ type Props = { children: ReactNode };
 
 const nav = [
   { href: '/', label: 'Home', icon: '🏠' },
-  { href: '/shop', label: 'Shop', icon: '🛒' },
-  { href: '/profile', label: 'Profile', icon: '👤' },
-  { href: '/upload', label: 'Upload', icon: '📤' },
-  { href: '/execute', label: 'Execute', icon: '⚡' },
-  { href: '/include', label: 'Include', icon: '📁' },
+  { href: '/tools', label: 'Tools', icon: '�' },
+  { href: '/login', label: 'Login', icon: '�' },
 ];
 
 export default function Layout({ children }: Props) {
