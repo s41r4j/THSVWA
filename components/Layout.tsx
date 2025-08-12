@@ -5,9 +5,9 @@ import { ReactNode, useState } from 'react';
 type Props = { children: ReactNode };
 
 const nav = [
-  { href: '/', label: 'Home', icon: '🏠' },
-  { href: '/tools', label: 'Tools', icon: '�' },
-  { href: '/login', label: 'Login', icon: '�' },
+  { href: '/', label: 'Home', icon: '◐' },
+  { href: '/tools', label: 'Tools', icon: '⚒' },
+  { href: '/login', label: 'Login', icon: '◈' },
 ];
 
 export default function Layout({ children }: Props) {
@@ -56,7 +56,7 @@ export default function Layout({ children }: Props) {
                 Submit Flag
               </Link>
               <button className="w-10 h-10 bg-hacksmith-light-gray rounded-lg flex items-center justify-center hover:bg-hacksmith-orange hover:text-black transition-colors">
-                🛒
+                ◎
               </button>
             </div>
 
@@ -127,10 +127,10 @@ export default function Layout({ children }: Props) {
                 Built for educational CTF challenges.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">📧</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">🐦</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">📱</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">💼</a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">✉</a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">≋</a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">◈</a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">⬢</a>
               </div>
             </div>
 
@@ -149,12 +149,12 @@ export default function Layout({ children }: Props) {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-hacksmith-orange">CTF Challenges</h3>
               <ul className="space-y-2 text-sm">
-                <li className="text-gray-400">🔍 SQL Injection</li>
+                <li className="text-gray-400">◎ SQL Injection</li>
                 <li className="text-gray-400">⚡ XSS Scripting</li>
-                <li className="text-gray-400">💥 Command Injection</li>
-                <li className="text-gray-400">📁 File Inclusion</li>
-                <li className="text-gray-400">🔐 IDOR Vulnerabilities</li>
-                <li className="text-gray-400">📤 File Upload Bypass</li>
+                <li className="text-gray-400">◈ Command Injection</li>
+                <li className="text-gray-400">□ File Inclusion</li>
+                <li className="text-gray-400">◐ IDOR Vulnerabilities</li>
+                <li className="text-gray-400">▲ File Upload Bypass</li>
               </ul>
             </div>
 
@@ -175,7 +175,7 @@ export default function Layout({ children }: Props) {
               © {new Date().getFullYear()} Hacksmith Shop. Educational CTF platform.
             </div>
             <div className="text-sm text-hacksmith-orange mt-2 md:mt-0">
-              ⚠️ Intentionally Vulnerable for Educational Purposes
+              ⚠ Intentionally Vulnerable for Educational Purposes
             </div>
           </div>
         </div>

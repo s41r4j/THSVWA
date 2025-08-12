@@ -75,7 +75,7 @@ export default function Login() {
       <div className="bg-gradient-to-r from-hacksmith-dark via-hacksmith-gray to-hacksmith-dark py-16">
         <div className="max-w-md mx-auto px-6 text-center">
           <div className="w-16 h-16 bg-hacksmith-orange rounded-full flex items-center justify-center text-3xl text-black font-bold mx-auto mb-4">
-            🔐
+            ◈
           </div>
           <h1 className="text-4xl font-bold text-hacksmith-orange mb-4">
             Login
@@ -132,7 +132,7 @@ export default function Login() {
 
         {/* Test XSS Section */}
         <div className="mt-6 card bg-red-900/20 border-red-500">
-          <h3 className="text-lg font-semibold text-red-400 mb-3">⚠️ XSS Testing</h3>
+          <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ XSS Testing</h3>
           <p className="text-sm text-red-300 mb-2">
             This login form is vulnerable to XSS. Try entering:
           </p>

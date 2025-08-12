@@ -50,7 +50,7 @@ export default function Profile() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔐</div>
+          <div className="text-6xl mb-4">◐</div>
           <p className="text-gray-400">Please log in to access your profile.</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function Profile() {
       <div className="bg-gradient-to-r from-hacksmith-dark via-hacksmith-gray to-hacksmith-dark py-12">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <div className="w-20 h-20 bg-hacksmith-orange rounded-full flex items-center justify-center text-3xl text-black font-bold mx-auto mb-4">
-            {user.isAdmin ? '�' : '�👤'}
+            {user.isAdmin ? '◆' : '◐'}
           </div>
           <h1 className="text-3xl font-bold text-hacksmith-orange mb-2">
             Welcome, {user.username}
@@ -172,7 +172,7 @@ export default function Profile() {
 
         {/* Vulnerability Info */}
         <div className="card bg-red-900/20 border-red-500 mb-6">
-          <h3 className="text-lg font-semibold text-red-400 mb-3">🔒 File Upload Vulnerability</h3>
+          <h3 className="text-lg font-semibold text-red-400 mb-3">◐ File Upload Vulnerability</h3>
           <div className="text-sm text-red-300 space-y-2">
             <p>This upload system is intentionally vulnerable:</p>
             <ul className="list-disc pl-4 space-y-1">

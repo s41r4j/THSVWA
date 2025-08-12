@@ -264,7 +264,7 @@ export default function Tools() {
               )}
               
               <p className="text-xs text-blue-400 mt-2">
-                ⚠️ This demonstrates Local File Inclusion (LFI) vulnerability
+                ⚠ This demonstrates Local File Inclusion (LFI) vulnerability
               </p>
             </div>
 

@@ -47,7 +47,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-hacksmith-dark via-hacksmith-gray to-hacksmith-dark py-16">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-bold text-hacksmith-orange mb-4 animate-glow">
+          <h1 className="text-5xl font-bold text-hacksmith-orange mb-4">
             Hacksmith Tools
           </h1>
           <p className="text-xl text-gray-300 mb-8">
@@ -125,7 +125,7 @@ export default function Home() {
       <section className="py-8 px-6 bg-hacksmith-gray">
         <div className="max-w-4xl mx-auto text-center">
           <div className="card bg-red-900/20 border-red-500">
-            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠️ Security Notice</h3>
+            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ Security Notice</h3>
             <p className="text-sm text-red-300">
               This application contains intentional vulnerabilities for educational purposes:
             </p>
