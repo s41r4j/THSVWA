@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactNode, useState } from 'react';
+import { useHints } from '../contexts/HintContext';
 
 type Props = { children: ReactNode };
 
@@ -13,6 +14,7 @@ const nav = [
 export default function Layout({ children }: Props) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { hintsVisible, toggleHints } = useHints();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -110,6 +112,21 @@ export default function Layout({ children }: Props) {
       </header>
 
       <main className="flex-1">{children}</main>
+
+      {/* Global Hint Toggle Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={toggleHints}
+          className={`px-6 py-3 rounded-full font-semibold shadow-lg transition-all transform hover:scale-105 flex items-center space-x-2 ${
+            hintsVisible 
+              ? 'bg-hacksmith-orange text-black shadow-hacksmith-orange/25 animate-pulse' 
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
+          }`}
+        >
+          <span className="text-lg">{hintsVisible ? '👁️' : '🕶️'}</span>
+          <span>Hint Mode: {hintsVisible ? 'ON' : 'OFF'}</span>
+        </button>
+      </div>
 
       <footer className="bg-hacksmith-gray border-t border-hacksmith-orange/20 mt-auto">
         <div className="max-w-7xl mx-auto px-6 py-12">

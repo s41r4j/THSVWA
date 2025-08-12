@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useHints } from '../contexts/HintContext';
 
 export default function Profile() {
   const [user, setUser] = useState<{username: string, isAdmin: boolean} | null>(null);
@@ -9,6 +10,7 @@ export default function Profile() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const router = useRouter();
+  const { hintsVisible } = useHints();
 
   useEffect(() => {
     // Check if user is logged in
@@ -109,7 +111,7 @@ export default function Profile() {
         </div>
 
         {/* Profile Image Upload - VULNERABLE */}
-        <div className="card mb-6">
+        <div className={`card mb-6 ${hintsVisible ? 'border-red-500/30' : ''}`}>
           <h2 className="text-xl font-bold text-hacksmith-orange mb-4">Profile Image</h2>
           
           <div className="space-y-4">
@@ -123,11 +125,19 @@ export default function Profile() {
                   setProfileImage(e.target.files?.[0] || null);
                   setUploadStatus('');
                 }}
-                className="w-full p-3 bg-hacksmith-gray border border-gray-600 rounded-lg text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-hacksmith-orange file:text-black file:font-semibold"
+                className={`w-full p-3 bg-hacksmith-gray border border-gray-600 rounded-lg text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-hacksmith-orange file:text-black file:font-semibold ${hintsVisible ? 'border-red-500/30' : ''}`}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Supported: JPG, PNG, GIF (but validation is weak...)
+                {hintsVisible ? 
+                  "Supported: JPG, PNG, GIF (but validation is weak...)" :
+                  "Upload your profile picture"
+                }
               </p>
+              {hintsVisible && (
+                <div className="mt-1 text-xs text-red-400 opacity-75">
+                  ⚠ File validation insufficient
+                </div>
+              )}
             </div>
 
             {profileImage && (
@@ -171,21 +181,23 @@ export default function Profile() {
         </div>
 
         {/* Vulnerability Info */}
-        <div className="card bg-red-900/20 border-red-500 mb-6">
-          <h3 className="text-lg font-semibold text-red-400 mb-3">◐ File Upload Vulnerability</h3>
-          <div className="text-sm text-red-300 space-y-2">
-            <p>This upload system is intentionally vulnerable:</p>
-            <ul className="list-disc pl-4 space-y-1">
-              <li>No proper file type validation</li>
-              <li>No file content inspection</li>
-              <li>Weak filename filtering</li>
-              <li>No size restrictions</li>
-            </ul>
-            <p className="text-xs text-red-400 mt-3">
-              Try uploading files with names like "flag.txt", "admin.php", or "script.sh"
-            </p>
+        {hintsVisible && (
+          <div className="card bg-red-900/20 border-red-500 mb-6">
+            <h3 className="text-lg font-semibold text-red-400 mb-3">◐ File Upload Vulnerability</h3>
+            <div className="text-sm text-red-300 space-y-2">
+              <p>This upload system is intentionally vulnerable:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>No proper file type validation</li>
+                <li>No file content inspection</li>
+                <li>Weak filename filtering</li>
+                <li>No size restrictions</li>
+              </ul>
+              <p className="text-xs text-red-400 mt-3">
+                Try uploading files with names like "flag.txt", "admin.php", or "script.sh"
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Account Actions */}
         <div className="card">

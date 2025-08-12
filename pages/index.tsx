@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
+import { useHints } from '../contexts/HintContext';
 
 export default function Home() {
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState('');
+  const { hintsVisible } = useHints();
 
   const products = [
     {
@@ -61,8 +63,8 @@ export default function Home() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search tools... (Try: <script>alert('XSS')</script>)"
-                className="input-field flex-1"
+                placeholder={hintsVisible ? "Search tools... (Try: <script>alert('XSS')</script>)" : "Search tools..."}
+                className={`input-field flex-1 ${hintsVisible ? 'border-red-500/30 focus:border-red-500' : ''}`}
               />
               <button onClick={handleSearch} className="btn-primary whitespace-nowrap">
                 Search
@@ -72,9 +74,16 @@ export default function Home() {
             {/* XSS Vulnerability - Dangerous innerHTML */}
             {searchResults && (
               <div 
-                className="mt-4 p-4 bg-hacksmith-gray rounded-lg text-left"
+                className={`mt-4 p-4 bg-hacksmith-gray rounded-lg text-left ${hintsVisible ? 'border border-red-500/30' : ''}`}
                 dangerouslySetInnerHTML={{ __html: searchResults }}
               />
+            )}
+            
+            {/* Subtle hint when hint mode is on */}
+            {hintsVisible && (
+              <div className="mt-2 text-xs text-red-400 opacity-75">
+                ⚠ Input not sanitized
+              </div>
             )}
           </div>
         </div>
@@ -122,21 +131,23 @@ export default function Home() {
       </section>
 
       {/* Security Notice */}
-      <section className="py-8 px-6 bg-hacksmith-gray">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="card bg-red-900/20 border-red-500">
-            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ Security Notice</h3>
-            <p className="text-sm text-red-300">
-              This application contains intentional vulnerabilities for educational purposes:
-            </p>
-            <ul className="text-sm text-red-300 mt-2 space-y-1">
-              <li>• XSS vulnerability in search functionality</li>
-              <li>• IDOR vulnerability in product URLs</li>
-              <li>• LFI vulnerability in product details</li>
-            </ul>
+      {hintsVisible && (
+        <section className="py-8 px-6 bg-hacksmith-gray">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="card bg-red-900/20 border-red-500">
+              <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ Security Notice</h3>
+              <p className="text-sm text-red-300">
+                This application contains intentional vulnerabilities for educational purposes:
+              </p>
+              <ul className="text-sm text-red-300 mt-2 space-y-1">
+                <li>• XSS vulnerability in search functionality</li>
+                <li>• IDOR vulnerability in product URLs</li>
+                <li>• LFI vulnerability in product details</li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

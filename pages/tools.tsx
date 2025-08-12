@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useHints } from '../contexts/HintContext';
 
 export default function Tools() {
   const router = useRouter();
   const { id, file } = router.query;
   const [fileContent, setFileContent] = useState('');
+  const { hintsVisible } = useHints();
 
   const products = {
     '1': {
@@ -97,7 +99,10 @@ export default function Tools() {
           <div className="text-6xl mb-4">❌</div>
           <h1 className="text-2xl font-bold text-hacksmith-orange mb-2">Product Not Found</h1>
           <p className="text-gray-400 mb-6">
-            Try different product IDs (1-4) or check for hidden products (hint: try larger numbers)
+            {hintsVisible ? 
+              "Try different product IDs (1-4) or check for hidden products (hint: try larger numbers)" :
+              "The requested product could not be found"
+            }
           </p>
           <Link href="/" className="btn-primary">
             Back to Home
@@ -130,7 +135,7 @@ export default function Tools() {
                 <Link 
                   key={key} 
                   href={`/tools?id=${key}`}
-                  className="product-card card card-hover"
+                  className={`product-card card card-hover ${hintsVisible ? 'border-blue-500/30' : ''}`}
                 >
                   <img 
                     src={prod.image} 
@@ -140,22 +145,29 @@ export default function Tools() {
                   <h3 className="font-bold text-lg mb-2">{prod.name}</h3>
                   <p className="text-sm text-gray-400 mb-4">{prod.description.substring(0, 100)}...</p>
                   <span className="text-2xl font-bold text-hacksmith-orange">${prod.price}</span>
+                  {hintsVisible && (
+                    <div className="mt-2 text-xs text-blue-400 opacity-75">
+                      ⚠ ID: {key}
+                    </div>
+                  )}
                 </Link>
               ))}
           </div>
 
           {/* IDOR Hints */}
-          <div className="mt-16 card bg-yellow-900/20 border-yellow-500">
-            <h3 className="text-lg font-semibold text-yellow-400 mb-3">🔍 Security Testing</h3>
-            <p className="text-sm text-yellow-300 mb-2">
-              This page contains IDOR vulnerabilities. Try:
-            </p>
-            <ul className="text-sm text-yellow-300 list-disc pl-4">
-              <li>Changing the ID parameter in the URL</li>
-              <li>Trying different number ranges (1-4 are normal, try others)</li>
-              <li>Looking for admin or hidden products</li>
-            </ul>
-          </div>
+          {hintsVisible && (
+            <div className="mt-16 card bg-yellow-900/20 border-yellow-500">
+              <h3 className="text-lg font-semibold text-yellow-400 mb-3">🔍 Security Testing</h3>
+              <p className="text-sm text-yellow-300 mb-2">
+                This page contains IDOR vulnerabilities. Try:
+              </p>
+              <ul className="text-sm text-yellow-300 list-disc pl-4">
+                <li>Changing the ID parameter in the URL</li>
+                <li>Trying different number ranges (1-4 are normal, try others)</li>
+                <li>Looking for admin or hidden products</li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -215,7 +227,7 @@ export default function Tools() {
             </div>
 
             {/* LFI Section */}
-            <div className="card bg-blue-900/20 border-blue-500">
+            <div className={`card bg-blue-900/20 border-blue-500 ${hintsVisible ? 'border-blue-400' : 'border-blue-800'}`}>
               <h3 className="text-lg font-semibold text-blue-400 mb-3">📁 Product Files</h3>
               <p className="text-sm text-blue-300 mb-3">
                 Load additional product information files:
@@ -236,8 +248,8 @@ export default function Tools() {
               </div>
               <input
                 type="text"
-                placeholder="Or enter file path (try: ../config.txt, ../../secret.txt)"
-                className="input-field text-sm mb-2"
+                placeholder={hintsVisible ? "Or enter file path (try: ../config.txt, ../../secret.txt)" : "Enter file path"}
+                className={`input-field text-sm mb-2 ${hintsVisible ? 'border-blue-500/50' : ''}`}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     const target = e.target as HTMLInputElement;
@@ -253,7 +265,7 @@ export default function Tools() {
               </button>
               
               {file && (
-                <div className="mt-3 p-3 bg-hacksmith-dark rounded border">
+                <div className={`mt-3 p-3 bg-hacksmith-dark rounded border ${hintsVisible ? 'border-red-500/30' : ''}`}>
                   <p className="text-xs text-gray-400 mb-2">File: {file}</p>
                   <pre className={`text-sm whitespace-pre-wrap ${
                     fileContent.includes('FLAG{') ? 'text-hacksmith-orange' : 'text-green-400'
@@ -263,9 +275,17 @@ export default function Tools() {
                 </div>
               )}
               
-              <p className="text-xs text-blue-400 mt-2">
-                ⚠ This demonstrates Local File Inclusion (LFI) vulnerability
-              </p>
+              {hintsVisible && (
+                <p className="text-xs text-blue-400 mt-2">
+                  ⚠ This demonstrates Local File Inclusion (LFI) vulnerability
+                </p>
+              )}
+              
+              {hintsVisible && (
+                <div className="mt-2 text-xs text-red-400 opacity-75">
+                  ⚠ File paths not validated
+                </div>
+              )}
             </div>
 
             <button className="btn-primary w-full">

@@ -70,3 +70,51 @@ body {
 .card-hover {
   @apply transition-all duration-300 hover:shadow-xl hover:border-hacksmith-orange;
 }
+
+/* Hint mode styles */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 122, 0, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255, 122, 0, 0.8), 0 0 30px rgba(255, 122, 0, 0.4);
+  }
+}
+
+.hint-indicator {
+  @apply relative;
+}
+
+.hint-indicator::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff7a00, #ff5722, #ff9800, #ff7a00);
+  background-size: 400% 400%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: gradient-shift 3s ease infinite;
+  opacity: 0.3;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
+  50% { border-color: rgba(239, 68, 68, 0.7); }
+}

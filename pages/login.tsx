@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useHints } from '../contexts/HintContext';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -8,6 +9,7 @@ export default function Login() {
   const [message, setMessage] = useState('');
   const [loginAttempts, setLoginAttempts] = useState<{username: string, timestamp: string, status: string}[]>([]);
   const router = useRouter();
+  const { hintsVisible } = useHints();
 
   // Hardcoded users
   const users = {
@@ -99,8 +101,13 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                className="input-field"
+                className={`input-field ${hintsVisible ? 'border-orange-500/30 focus:border-orange-500' : ''}`}
               />
+              {hintsVisible && (
+                <div className="mt-1 text-xs text-orange-400 opacity-75">
+                  ⚠ SQL queries not sanitized
+                </div>
+              )}
             </div>
 
             <div>
@@ -124,43 +131,53 @@ export default function Login() {
           {/* XSS Vulnerability - Display message with dangerouslySetInnerHTML */}
           {message && (
             <div 
-              className="mt-4 p-3 rounded border bg-hacksmith-light-gray border-gray-600"
+              className={`mt-4 p-3 rounded border bg-hacksmith-light-gray border-gray-600 ${hintsVisible ? 'border-red-500/30' : ''}`}
               dangerouslySetInnerHTML={{ __html: message }}
             />
+          )}
+          
+          {hintsVisible && message && (
+            <div className="mt-2 text-xs text-red-400 opacity-75">
+              ⚠ Output not escaped
+            </div>
           )}
         </div>
 
         {/* Test XSS Section */}
-        <div className="mt-6 card bg-red-900/20 border-red-500">
-          <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ XSS Testing</h3>
-          <p className="text-sm text-red-300 mb-2">
-            This login form is vulnerable to XSS. Try entering:
-          </p>
-          <ul className="text-sm text-red-300 list-disc pl-4 space-y-1">
-            <li><code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></li>
-            <li><code>&lt;img src=x onerror=alert('FLAG&#123;XSS_LOGIN&#125;')&gt;</code></li>
-            <li><code>&lt;svg onload=alert('XSS')&gt;</code></li>
-          </ul>
-          <p className="text-xs text-red-400 mt-2">
-            The vulnerability is in the error message display system.
-          </p>
-        </div>
+        {hintsVisible && (
+          <div className="mt-6 card bg-red-900/20 border-red-500">
+            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ XSS Testing</h3>
+            <p className="text-sm text-red-300 mb-2">
+              This login form is vulnerable to XSS. Try entering:
+            </p>
+            <ul className="text-sm text-red-300 list-disc pl-4 space-y-1">
+              <li><code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></li>
+              <li><code>&lt;img src=x onerror=alert('FLAG&#123;XSS_LOGIN&#125;')&gt;</code></li>
+              <li><code>&lt;svg onload=alert('XSS')&gt;</code></li>
+            </ul>
+            <p className="text-xs text-red-400 mt-2">
+              The vulnerability is in the error message display system.
+            </p>
+          </div>
+        )}
 
         {/* SQL Injection Info */}
-        <div className="mt-6 card bg-blue-900/20 border-blue-500">
-          <h3 className="text-lg font-semibold text-blue-400 mb-3">🔍 SQL Injection Testing</h3>
-          <p className="text-sm text-blue-300 mb-2">
-            Try SQL injection payloads in the username field:
-          </p>
-          <ul className="text-sm text-blue-300 list-disc pl-4 space-y-1">
-            <li><code>' OR '1'='1</code></li>
-            <li><code>admin'; --</code></li>
-            <li><code>' UNION SELECT * FROM users; --</code></li>
-          </ul>
-          <p className="text-xs text-blue-400 mt-2">
-            Note: Admin user is protected from SQL injection, normal users are not.
-          </p>
-        </div>
+        {hintsVisible && (
+          <div className="mt-6 card bg-blue-900/20 border-blue-500">
+            <h3 className="text-lg font-semibold text-blue-400 mb-3">🔍 SQL Injection Testing</h3>
+            <p className="text-sm text-blue-300 mb-2">
+              Try SQL injection payloads in the username field:
+            </p>
+            <ul className="text-sm text-blue-300 list-disc pl-4 space-y-1">
+              <li><code>' OR '1'='1</code></li>
+              <li><code>admin'; --</code></li>
+              <li><code>' UNION SELECT * FROM users; --</code></li>
+            </ul>
+            <p className="text-xs text-blue-400 mt-2">
+              Note: Admin user is protected from SQL injection, normal users are not.
+            </p>
+          </div>
+        )}
 
         {/* Login Attempts History */}
         {loginAttempts.length > 0 && (
@@ -187,28 +204,30 @@ export default function Login() {
         )}
 
         {/* Hardcoded Credentials */}
-        <div className="mt-8 card bg-gray-800/50">
-          <h3 className="text-lg font-semibold text-gray-400 mb-3">📋 Test Credentials</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
-              <div>
-                <div className="font-semibold text-white">Normal User</div>
-                <div className="text-gray-400">Username: <code>normal</code></div>
-                <div className="text-gray-400">Password: <code>password123</code></div>
+        {hintsVisible && (
+          <div className="mt-8 card bg-gray-800/50">
+            <h3 className="text-lg font-semibold text-gray-400 mb-3">📋 Test Credentials</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
+                <div>
+                  <div className="font-semibold text-white">Normal User</div>
+                  <div className="text-gray-400">Username: <code>normal</code></div>
+                  <div className="text-gray-400">Password: <code>password123</code></div>
+                </div>
+                <span className="text-yellow-400 text-xs">SQL Vulnerable</span>
               </div>
-              <span className="text-yellow-400 text-xs">SQL Vulnerable</span>
-            </div>
-            
-            <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
-              <div>
-                <div className="font-semibold text-white">Admin User</div>
-                <div className="text-gray-400">Username: <code>admin</code></div>
-                <div className="text-gray-400">Password: <code>admin456</code></div>
+              
+              <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
+                <div>
+                  <div className="font-semibold text-white">Admin User</div>
+                  <div className="text-gray-400">Username: <code>admin</code></div>
+                  <div className="text-gray-400">Password: <code>admin456</code></div>
+                </div>
+                <span className="text-green-400 text-xs">SQL Protected</span>
               </div>
-              <span className="text-green-400 text-xs">SQL Protected</span>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Back to Home */}
         <div className="mt-6 text-center">
