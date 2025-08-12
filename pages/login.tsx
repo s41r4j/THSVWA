@@ -13,8 +13,8 @@ export default function Login() {
 
   // Hardcoded users
   const users = {
-    'normal': { password: 'password123', isAdmin: false },
-    'admin': { password: 'admin456', isAdmin: true }
+    'u53r': { password: 'u53r', isAdmin: false },
+    'admin': { password: '4dm1n', isAdmin: true }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -210,8 +210,8 @@ export default function Login() {
             <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
               <div>
                 <div className="font-semibold text-white">Normal User</div>
-                <div className="text-gray-400">Username: <code>normal</code></div>
-                <div className="text-gray-400">Password: <code>password123</code></div>
+                <div className="text-gray-400">Username: <code>u53r</code></div>
+                <div className="text-gray-400">Password: <code>u53r</code></div>
               </div>
               {hintsVisible && (
                 <span className="text-yellow-400 text-xs">SQL Vulnerable</span>
@@ -222,7 +222,7 @@ export default function Login() {
               <div>
                 <div className="font-semibold text-white">Admin User</div>
                 <div className="text-gray-400">Username: <code>admin</code></div>
-                <div className="text-gray-400">Password: <code>admin456</code></div>
+                <div className="text-gray-400">Password: <code>4dm1n</code></div>
               </div>
               {hintsVisible && (
                 <span className="text-green-400 text-xs">SQL Protected</span>

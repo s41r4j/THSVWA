@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  thsvwa:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    container_name: thsvwa-app
+    networks:
+      - thsvwa-network
+
+networks:
+  thsvwa-network:
+    driver: bridge

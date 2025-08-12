@@ -87,17 +87,34 @@ export default function Layout({ children }: Props) {
       <main className="flex-1">{children}</main>
 
       {/* Global Hint Toggle Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50 group">
         <button
           onClick={toggleHints}
-          className={`px-6 py-3 rounded-full font-semibold shadow-lg transition-all transform hover:scale-105 flex items-center space-x-2 ${
+          className={`relative overflow-hidden px-4 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 group-hover:px-6 ${
             hintsVisible 
-              ? 'bg-hacksmith-orange text-black shadow-hacksmith-orange/25 animate-pulse' 
+              ? 'bg-hacksmith-orange text-black shadow-hacksmith-orange/25' 
               : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
           }`}
         >
-          <span className="text-lg">{hintsVisible ? '👁️' : '🕶️'}</span>
-          <span>Hint Mode: {hintsVisible ? 'ON' : 'OFF'}</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-lg transition-transform duration-300 group-hover:rotate-12">
+              {hintsVisible ? '◉' : '◎'}
+            </span>
+            <span className="whitespace-nowrap transition-all duration-300">
+              Hint Mode: {hintsVisible ? 'ON' : 'OFF'}
+            </span>
+          </div>
+          
+          {/* Expandable hint text on hover */}
+          <div className={`absolute left-0 top-0 w-full h-full flex items-center justify-center px-4 py-3 rounded-full transition-all duration-300 transform ${
+            hintsVisible 
+              ? 'bg-hacksmith-orange text-black' 
+              : 'bg-gray-700 text-gray-200'
+          } translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100`}>
+            <span className="text-sm font-medium whitespace-nowrap">
+              {hintsVisible ? '▼ Hide security hints' : '▲ Show security hints'}
+            </span>
+          </div>
         </button>
       </div>
 
@@ -141,9 +158,9 @@ export default function Layout({ children }: Props) {
               <ul className="space-y-2 text-sm">
                 <li className="text-gray-400">◎ SQL Injection</li>
                 <li className="text-gray-400">⚡ XSS Scripting</li>
-                <li className="text-gray-400">◈ File Upload Bypass</li>
-                <li className="text-gray-400">□ Authentication Bypass</li>
-                <li className="text-gray-400">◐ Session Management</li>
+                <li className="text-gray-400">◈ IDOR Vulnerabilities</li>
+                <li className="text-gray-400">□ File Inclusion (LFI)</li>
+                <li className="text-gray-400">◐ File Upload Bypass</li>
                 <li className="text-gray-400">▲ Input Validation</li>
               </ul>
             </div>
