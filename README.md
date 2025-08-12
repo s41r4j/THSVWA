@@ -1,5 +1,5 @@
 # THSVWA
-> **T**he **H**acksmith **S**hop **V**ulnerable **W**eb **A**pplication
+> The Hacksmith Shop Vulnerable Web Application
 
 ## Project Overview
 
