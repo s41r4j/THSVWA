@@ -6,9 +6,7 @@ import { useHints } from '../contexts/HintContext';
 type Props = { children: ReactNode };
 
 const nav = [
-  { href: '/', label: 'Home', icon: '◐' },
-  { href: '/tools', label: 'Tools', icon: '⚒' },
-  { href: '/login', label: 'Login', icon: '◈' },
+  // Navigation items removed - using logo for home and buttons for actions
 ];
 
 export default function Layout({ children }: Props) {
@@ -31,29 +29,16 @@ export default function Layout({ children }: Props) {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Removed, using action buttons instead */}
             <nav className="hidden md:flex items-center space-x-1">
-              {nav.map((item) => {
-                const active = router.pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                      active
-                        ? 'bg-hacksmith-orange text-black shadow-lg'
-                        : 'text-gray-300 hover:text-white hover:bg-hacksmith-light-gray'
-                    }`}
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+              {/* Navigation removed */}
             </nav>
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-4">
+              <Link href="/login" className="btn-secondary text-sm">
+                Login
+              </Link>
               <Link href="/flag" className="btn-secondary text-sm">
                 Submit Flag
               </Link>
@@ -77,28 +62,16 @@ export default function Layout({ children }: Props) {
         {/* Mobile Menu */}
         <div className={`md:hidden transition-all duration-300 overflow-hidden ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="px-6 py-4 bg-hacksmith-gray border-t border-hacksmith-orange/20">
-            <nav className="space-y-2">
-              {nav.map((item) => {
-                const active = router.pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                      active
-                        ? 'bg-hacksmith-orange text-black'
-                        : 'text-gray-300 hover:text-white hover:bg-hacksmith-light-gray'
-                    }`}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+            {/* Mobile navigation removed */}
             
-            <div className="mt-4 pt-4 border-t border-gray-600 space-y-2">
+            <div className="space-y-2">
+              <Link 
+                href="/login" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full text-center btn-secondary"
+              >
+                Login
+              </Link>
               <Link 
                 href="/flag" 
                 onClick={() => setMobileMenuOpen(false)}
@@ -155,9 +128,9 @@ export default function Layout({ children }: Props) {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-hacksmith-orange">Quick Links</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/shop" className="text-gray-400 hover:text-white transition-colors">All Products</Link></li>
-                <li><Link href="/shop?category=tools" className="text-gray-400 hover:text-white transition-colors">Security Tools</Link></li>
-                <li><Link href="/shop?category=apparel" className="text-gray-400 hover:text-white transition-colors">Apparel</Link></li>
+                <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
+                <li><Link href="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link></li>
+                <li><Link href="/profile" className="text-gray-400 hover:text-white transition-colors">Profile</Link></li>
                 <li><Link href="/flag" className="text-gray-400 hover:text-white transition-colors">Submit Flag</Link></li>
               </ul>
             </div>
@@ -168,10 +141,10 @@ export default function Layout({ children }: Props) {
               <ul className="space-y-2 text-sm">
                 <li className="text-gray-400">◎ SQL Injection</li>
                 <li className="text-gray-400">⚡ XSS Scripting</li>
-                <li className="text-gray-400">◈ Command Injection</li>
-                <li className="text-gray-400">□ File Inclusion</li>
-                <li className="text-gray-400">◐ IDOR Vulnerabilities</li>
-                <li className="text-gray-400">▲ File Upload Bypass</li>
+                <li className="text-gray-400">◈ File Upload Bypass</li>
+                <li className="text-gray-400">□ Authentication Bypass</li>
+                <li className="text-gray-400">◐ Session Management</li>
+                <li className="text-gray-400">▲ Input Validation</li>
               </ul>
             </div>
 

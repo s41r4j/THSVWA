@@ -98,10 +98,9 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <Link 
+              <div
                 key={product.id} 
-                href={`/tools?id=${product.id}`}
-                className="product-card card card-hover group"
+                className="product-card card card-hover group cursor-not-allowed opacity-75"
               >
                 <div className="h-48 mb-4 rounded-lg bg-white flex items-center justify-center overflow-hidden">
                   <img 
@@ -120,11 +119,11 @@ export default function Home() {
                   <span className="text-2xl font-bold text-hacksmith-orange">
                     ${product.price}
                   </span>
-                  <span className="text-sm text-hacksmith-orange hover:underline">
-                    View Details →
+                  <span className="text-sm text-gray-500">
+                    Coming Soon
                   </span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -141,8 +140,8 @@ export default function Home() {
               </p>
               <ul className="text-sm text-red-300 mt-2 space-y-1">
                 <li>• XSS vulnerability in search functionality</li>
-                <li>• IDOR vulnerability in product URLs</li>
-                <li>• LFI vulnerability in product details</li>
+                <li>• SQL injection in login system</li>
+                <li>• File upload vulnerabilities</li>
               </ul>
             </div>
           </div>

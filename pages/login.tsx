@@ -203,31 +203,33 @@ export default function Login() {
           </div>
         )}
 
-        {/* Hardcoded Credentials */}
-        {hintsVisible && (
-          <div className="mt-8 card bg-gray-800/50">
-            <h3 className="text-lg font-semibold text-gray-400 mb-3">📋 Test Credentials</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
-                <div>
-                  <div className="font-semibold text-white">Normal User</div>
-                  <div className="text-gray-400">Username: <code>normal</code></div>
-                  <div className="text-gray-400">Password: <code>password123</code></div>
-                </div>
+        {/* Hardcoded Credentials - Always visible, but vulnerability status only in hint mode */}
+        <div className="mt-8 card bg-gray-800/50">
+          <h3 className="text-lg font-semibold text-gray-400 mb-3">📋 Test Credentials</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
+              <div>
+                <div className="font-semibold text-white">Normal User</div>
+                <div className="text-gray-400">Username: <code>normal</code></div>
+                <div className="text-gray-400">Password: <code>password123</code></div>
+              </div>
+              {hintsVisible && (
                 <span className="text-yellow-400 text-xs">SQL Vulnerable</span>
+              )}
+            </div>
+            
+            <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
+              <div>
+                <div className="font-semibold text-white">Admin User</div>
+                <div className="text-gray-400">Username: <code>admin</code></div>
+                <div className="text-gray-400">Password: <code>admin456</code></div>
               </div>
-              
-              <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
-                <div>
-                  <div className="font-semibold text-white">Admin User</div>
-                  <div className="text-gray-400">Username: <code>admin</code></div>
-                  <div className="text-gray-400">Password: <code>admin456</code></div>
-                </div>
+              {hintsVisible && (
                 <span className="text-green-400 text-xs">SQL Protected</span>
-              </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
         {/* Back to Home */}
         <div className="mt-6 text-center">
