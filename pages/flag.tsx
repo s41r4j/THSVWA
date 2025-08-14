@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { useHints } from '../contexts/HintContext';
 import Link from 'next/link';
 
@@ -18,7 +18,94 @@ export default function FlagSubmit() {
   const [loading, setLoading] = useState(false);
   const [selectedVuln, setSelectedVuln] = useState<VulnerabilityInfo | null>(null);
   const [submissionHistory, setSubmissionHistory] = useState<{flag: string, timestamp: string, status: string, points?: number}[]>([]);
+  const [foundFlags, setFoundFlags] = useState<Set<string>>(new Set());
   const { hintsVisible } = useHints();
+
+  // Cookie utility functions
+  const setCookie = (name: string, value: string, hours: number = 24) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (hours * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+  };
+
+  const getCookie = (name: string): string | null => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+  };
+
+  const deleteCookie = (name: string) => {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  };
+
+  // Load session data on component mount from cookies and sessionStorage
+  useEffect(() => {
+    // Load submission history from sessionStorage (clears when browser tab closes)
+    const savedHistory = sessionStorage.getItem('thsvwa_submission_history');
+    if (savedHistory) {
+      try {
+        setSubmissionHistory(JSON.parse(savedHistory));
+      } catch (e) {
+        console.error('Failed to load submission history:', e);
+        sessionStorage.removeItem('thsvwa_submission_history');
+      }
+    }
+    
+    // Load found flags from cookie with fallback to sessionStorage
+    let flagsLoaded = false;
+    const savedFlags = getCookie('thsvwa_found_flags');
+    if (savedFlags) {
+      try {
+        const flagsArray = JSON.parse(savedFlags);
+        setFoundFlags(new Set(flagsArray));
+        flagsLoaded = true;
+      } catch (e) {
+        console.error('Failed to load found flags from cookie:', e);
+        deleteCookie('thsvwa_found_flags');
+      }
+    }
+    
+    // Fallback to sessionStorage if cookie failed
+    if (!flagsLoaded) {
+      const sessionFlags = sessionStorage.getItem('thsvwa_found_flags');
+      if (sessionFlags) {
+        try {
+          const flagsArray = JSON.parse(sessionFlags);
+          setFoundFlags(new Set(flagsArray));
+        } catch (e) {
+          console.error('Failed to load found flags from sessionStorage:', e);
+          sessionStorage.removeItem('thsvwa_found_flags');
+        }
+      }
+    }
+  }, []);
+
+  // Save to sessionStorage and cookies whenever data changes
+  useEffect(() => {
+    if (submissionHistory.length > 0) {
+      sessionStorage.setItem('thsvwa_submission_history', JSON.stringify(submissionHistory));
+    }
+  }, [submissionHistory]);
+
+  useEffect(() => {
+    if (foundFlags.size > 0) {
+      const flagsArray = Array.from(foundFlags);
+      // Save to sessionStorage for immediate backup
+      sessionStorage.setItem('thsvwa_found_flags', JSON.stringify(flagsArray));
+      
+      // Set cookie that expires in 8 hours (reasonable session time)
+      setCookie('thsvwa_found_flags', JSON.stringify(flagsArray), 8);
+    } else {
+      // Clear both storage types when no flags
+      sessionStorage.removeItem('thsvwa_found_flags');
+      deleteCookie('thsvwa_found_flags');
+    }
+  }, [foundFlags]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,6 +140,14 @@ export default function FlagSubmit() {
       
       if (res.ok) {
         setFlag('');
+        // Add to found flags set for session persistence
+        if (flag.startsWith('FL4G{')) {
+          setFoundFlags(prev => {
+            const newSet = new Set(prev);
+            newSet.add(flag);
+            return newSet;
+          });
+        }
         // Show vulnerability info for successful submission
         const vulnType = flag.match(/FL4G\{([^_]+)/)?.[1];
         if (vulnType) {
@@ -174,6 +269,7 @@ export default function FlagSubmit() {
 
   const totalPoints = submissionHistory.reduce((sum, sub) => sum + (sub.points || 0), 0);
   const successfulSubmissions = submissionHistory.filter(sub => sub.status === 'success').length;
+  const uniqueFlags = foundFlags.size;
 
   return (
     <div className="min-h-screen">
@@ -199,8 +295,8 @@ export default function FlagSubmit() {
               <div className="text-gray-400">Total Points</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">{successfulSubmissions}</div>
-              <div className="text-gray-400">Flags Found</div>
+              <div className="text-2xl font-bold text-green-400">{uniqueFlags}</div>
+              <div className="text-gray-400">Unique Flags</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">{vulnerabilities.length}</div>
@@ -264,7 +360,12 @@ export default function FlagSubmit() {
             {/* Recent Submissions */}
             {submissionHistory.length > 0 && (
               <div className="card">
-                <h3 className="text-lg font-semibold text-hacksmith-orange mb-3">📊 Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-hacksmith-orange mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                  </svg>
+                  Recent Activity
+                </h3>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {submissionHistory.map((submission, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-hacksmith-light-gray rounded text-xs">
@@ -283,6 +384,27 @@ export default function FlagSubmit() {
                           {submission.status.toUpperCase()}
                         </span>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Found Flags Collection */}
+            {foundFlags.size > 0 && (
+              <div className="card">
+                <h3 className="text-lg font-semibold text-green-400 mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/>
+                  </svg>
+                  Discovered Flags ({foundFlags.size})
+                </h3>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {Array.from(foundFlags).map((discoveredFlag, index) => (
+                    <div key={index} className="p-2 bg-green-900/20 border border-green-500/30 rounded">
+                      <code className="text-xs text-green-400 break-all">
+                        {discoveredFlag}
+                      </code>
                     </div>
                   ))}
                 </div>
@@ -339,18 +461,31 @@ export default function FlagSubmit() {
                     onClick={() => setSelectedVuln(null)}
                     className="text-gray-400 hover:text-white"
                   >
-                    ✕
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
                 
                 <div className="space-y-6">
                   <div>
-                    <h4 className="font-semibold text-white mb-2">📝 Description</h4>
+                    <h4 className="font-semibold text-white mb-2 flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                      </svg>
+                      Description
+                    </h4>
                     <p className="text-gray-300 text-sm">{selectedVuln.description}</p>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-white mb-2">🛡️ Mitigation Strategies</h4>
+                    <h4 className="font-semibold text-white mb-2 flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V18H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
+                      </svg>
+                      Mitigation Strategies
+                    </h4>
                     <ul className="space-y-1">
                       {selectedVuln.mitigation.map((item, idx) => (
                         <li key={idx} className="text-gray-300 text-sm flex items-start">
@@ -362,7 +497,12 @@ export default function FlagSubmit() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-white mb-2">📚 Learning Resources</h4>
+                    <h4 className="font-semibold text-white mb-2 flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                      </svg>
+                      Learning Resources
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {selectedVuln.resources.map((resource, idx) => (
                         <a 
@@ -395,7 +535,10 @@ export default function FlagSubmit() {
             {/* Educational Notice */}
             <div className="card bg-yellow-900/10 border-yellow-500/30">
               <h3 className="text-lg font-semibold text-yellow-400 mb-3 flex items-center">
-                ⚠️ Ethical Hacking Notice
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+                Ethical Hacking Notice
               </h3>
               <div className="text-sm text-yellow-300 space-y-2">
                 <p>
@@ -408,8 +551,11 @@ export default function FlagSubmit() {
                   <li>Educational labs and CTF competitions</li>
                   <li>Bug bounty programs with explicit permission</li>
                 </ul>
-                <p className="font-semibold">
-                  🚫 Never attempt these techniques on systems you don't own or lack explicit permission to test.
+                <p className="font-semibold flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-8h2v6h-2V9z"/>
+                  </svg>
+                  Never attempt these techniques on systems you don't own or lack explicit permission to test.
                 </p>
               </div>
             </div>

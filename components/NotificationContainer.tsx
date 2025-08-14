@@ -206,18 +206,11 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
               {getIcon()}
             </div>
             <div>
-              <h3 className="font-bold text-2xl mb-1">{title}</h3>
+              <h3 className="font-bold text-lg mb-1">{title}</h3>
               {vulnerabilityType && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm opacity-90 uppercase tracking-widest font-semibold bg-white/15 px-3 py-1 rounded-full border border-white/20">
+                  <span className="text-xs opacity-90 uppercase tracking-widest font-semibold bg-white/10 px-2 py-1 rounded-full border border-white/15">
                     {vulnerabilityType} VULNERABILITY
-                  </span>
-                </div>
-              )}
-              {points !== undefined && (
-                <div className="flex items-center space-x-2 mt-2">
-                  <span className="text-lg bg-gradient-to-r from-white/30 to-white/20 px-4 py-2 rounded-full font-bold border border-white/30 shadow-lg backdrop-blur-sm">
-                    +{points} points
                   </span>
                 </div>
               )}
@@ -235,49 +228,42 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
       </div>
 
       {/* Enhanced Content */}
-      <div className="p-6 relative">
-        <p className="text-lg mb-5 leading-relaxed font-medium">{message}</p>
+      <div className="p-4 relative">
+        <p className="text-sm mb-4 leading-relaxed">{message}</p>
         
         {flag && (
-          <div className="bg-black/50 rounded-2xl p-5 mb-5 border border-white/20 backdrop-blur-sm relative overflow-hidden">
+          <div className="bg-black/30 rounded-xl p-4 mb-4 border border-white/15 backdrop-blur-sm relative overflow-hidden">
             {/* Subtle background pattern */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/3 to-transparent"></div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <span className="text-lg font-bold opacity-95 tracking-wide flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-sm font-semibold opacity-90 tracking-wide flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/>
                 </svg>
                 YOUR FLAG:
               </span>
               <button
                 onClick={() => navigator.clipboard.writeText(flag)}
-                className="text-base bg-white/30 hover:bg-white/40 px-4 py-2 rounded-xl transition-all duration-200 font-semibold border border-white/20 backdrop-blur-sm shadow-lg hover:shadow-xl"
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-all duration-200 font-medium border border-white/15 backdrop-blur-sm shadow-sm hover:shadow-md"
               >
                 Copy
               </button>
             </div>
-            <code className="text-2xl font-bold break-all select-all block bg-black/40 p-4 rounded-xl border border-white/15 backdrop-blur-sm relative z-10">
+            <code className="text-lg font-mono break-all select-all block bg-black/30 p-3 rounded-lg border border-white/10 backdrop-blur-sm relative z-10">
               {flag}
             </code>
           </div>
         )}
 
-        {/* Enhanced Timer */}
-        <div className="flex items-center justify-between text-base opacity-90 bg-white/10 px-4 py-3 rounded-xl backdrop-blur-sm border border-white/20">
-          <span className="font-medium">Auto-dismiss in {secondsLeft}s</span>
-          <span className="font-bold">{Math.round(progressPercentage)}%</span>
-        </div>
       </div>
 
-      {/* Enhanced Progress bar */}
-      <div className="h-3 bg-black/40 rounded-b-3xl overflow-hidden relative">
+      {/* Simple Progress bar - reverse loading */}
+      <div className="h-2 bg-black/20 rounded-b-2xl overflow-hidden relative">
         <div
-          className="h-full bg-gradient-to-r from-white/70 via-white/60 to-white/50 transition-all duration-1000 ease-linear relative"
+          className="h-full bg-gradient-to-r from-white/40 via-white/30 to-white/20 transition-all duration-1000 ease-linear"
           style={{ width: `${progressPercentage}%` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
-        </div>
+        ></div>
       </div>
     </div>
     </>

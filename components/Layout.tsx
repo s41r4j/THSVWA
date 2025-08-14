@@ -17,7 +17,32 @@ export default function Layout({ children }: Props) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<{username: string, isAdmin: boolean} | null>(null);
+  const [showFirstTimeHint, setShowFirstTimeHint] = useState(false);
+  const [hintTimeLeft, setHintTimeLeft] = useState(12);
   const { hintsVisible, toggleHints } = useHints();
+
+  // Check if user is visiting for the first time
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('thsvwa_has_visited');
+    if (!hasVisited) {
+      setShowFirstTimeHint(true);
+      localStorage.setItem('thsvwa_has_visited', 'true');
+      
+      // Start countdown timer
+      const countdown = setInterval(() => {
+        setHintTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            setShowFirstTimeHint(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(countdown);
+    }
+  }, []);
 
   // Check login status on component mount and when localStorage changes
   useEffect(() => {
@@ -110,9 +135,9 @@ export default function Layout({ children }: Props) {
                     className="btn-secondary text-sm flex items-center space-x-2"
                   >
                     {userInfo?.isAdmin ? (
-                      <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        <circle cx="18" cy="6" r="3" fill="currentColor" opacity="0.8"/>
+                        <circle cx="18" cy="6" r="3" fill="currentColor" opacity="0.6"/>
                         <text x="18" y="9" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">A</text>
                       </svg>
                     ) : (
@@ -349,6 +374,59 @@ export default function Layout({ children }: Props) {
           </div>
         </div>
       </footer>
+
+      {/* First Time Visitor Hint */}
+      {showFirstTimeHint && (
+        <div className="fixed inset-0 z-40 pointer-events-none">
+          {/* Subtle overlay */}
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+          
+          {/* Hint content */}
+          <div className="absolute bottom-24 right-6 flex items-center space-x-3 pointer-events-auto">
+            {/* Animated arrow pointing to hint button */}
+            <div className="relative">
+              <div className="animate-bounce">
+                <svg className="w-8 h-8 text-hacksmith-orange drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </div>
+              {/* Pulsing glow effect */}
+              <div className="absolute inset-0 animate-ping">
+                <svg className="w-8 h-8 text-hacksmith-orange/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </div>
+            </div>
+            
+            {/* Hint text */}
+            <div className="bg-hacksmith-gray/95 border border-hacksmith-orange/50 rounded-xl px-4 py-3 shadow-2xl backdrop-blur-sm max-w-xs relative">
+              {/* Close button */}
+              <button
+                onClick={() => setShowFirstTimeHint(false)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-hacksmith-orange text-black rounded-full flex items-center justify-center text-xs font-bold hover:bg-orange-400 transition-colors"
+              >
+                ×
+              </button>
+              
+              <div className="flex items-center space-x-2 mb-2">
+                <svg className="w-5 h-5 text-hacksmith-orange" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span className="text-sm font-semibold text-hacksmith-orange">New here?</span>
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Click the hint button below to get helpful guidance while exploring vulnerabilities!
+              </p>
+              <div className="mt-2 text-xs text-gray-500">
+                Disappears in {hintTimeLeft}s
+              </div>
+            </div>
+          </div>
+          
+          {/* Subtle highlight ring around hint button */}
+          <div className="absolute bottom-6 right-6 w-14 h-14 rounded-full border-2 border-hacksmith-orange/60 animate-pulse pointer-events-none"></div>
+        </div>
+      )}
 
       {/* Notification Container */}
       <NotificationContainer />

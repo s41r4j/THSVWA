@@ -171,22 +171,6 @@ export default function Contact() {
                 </p>
               </div>
             </div>
-
-            <div className="card bg-green-900/20 border-green-500/30">
-              <h2 className="text-2xl font-bold text-green-400 mb-6">Acknowledgments</h2>
-              
-              <div className="space-y-3 text-sm text-green-300">
-                <p>
-                  Special thanks to the cybersecurity community, OWASP foundation, and educational 
-                  institutions that promote security awareness and ethical hacking practices.
-                </p>
-                
-                <p>
-                  This project is inspired by other vulnerable applications like DVWA, WebGoat, 
-                  and Damn Vulnerable Web Application for their contribution to security education.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 

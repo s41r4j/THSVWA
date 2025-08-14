@@ -115,17 +115,18 @@ export default function ProductDetail() {
 
   const products = {
     '0': {
-      name: '🎉 SECRET ADMIN VAULT 🎉',
-      price: 0,
-      image: '/assets/hammer.png',
-      description: '🚨 CONGRATULATIONS! 🚨 You have discovered the hidden admin vault through IDOR exploitation! This demonstrates how attackers can access unauthorized resources by manipulating object references.',
+      name: 'CLASSIFIED: Master Forge System',
+      price: 99999,
+      image: '/assets/anvil.png',
+      description: '⚠️ RESTRICTED ACCESS ⚠️ This is a classified, high-security metalworking system reserved for authorized personnel only. Access to this product indicates a security vulnerability has been exploited.',
       flag: 'FL4G{1D0R_4DM1N_4CC355}',
       specs: {
-        'Access Level': '🔓 ADMIN ONLY',
-        'Vulnerability': 'IDOR (Insecure Direct Object Reference)',
+        'Classification': '🔒 TOP SECRET',
+        'Access Level': 'ADMIN ONLY',
+        'Security Clearance': 'LEVEL 9',
+        'Vulnerability Exploited': 'IDOR (Insecure Direct Object Reference)',
         'Reward Flag': 'FL4G{1D0R_4DM1N_4CC355}',
-        'Security Risk': '🚨 CRITICAL',
-        'Discovery Method': '🔍 URL Parameter Manipulation'
+        'Risk Assessment': '🚨 CRITICAL BREACH'
       }
     },
     '1': {
@@ -190,13 +191,16 @@ export default function ProductDetail() {
     }
   } as Record<string, any>;
 
-  // LFI Vulnerability - Simulated file inclusion
+  // LFI Vulnerability - Simulated file inclusion with realistic system files
   const files = {
-    'info.txt': 'Product information file loaded successfully.',
-    'specs.txt': 'Technical specifications document.',
-    '../config.txt': 'FL4G{LF1_C0NF1G_4CC355} - Configuration file accessed via Local File Inclusion!',
-    '../../secret.txt': 'FL4G{LF1_53CR3T_F1L3} - Secret file accessed through directory traversal!',
-    '/etc/passwd': 'root:x:0:0:root:/root:/bin/bash\nFL4G{LF1_5Y5T3M_F1L3}',
+    'info.txt': 'Product documentation:\n\nThis file contains basic product information and usage guidelines.\n\nCreated: 2024-01-15\nLast Modified: 2024-03-10\nVersion: 1.2',
+    'specs.txt': 'Technical Specifications:\n\nMaterial: High-grade steel\nDimensions: Variable by product\nManufacturer: Hacksmith Industries\nCompliance: ISO 9001',
+    '../config.txt': '# Application Configuration File\n# WARNING: This file should not be publicly accessible\n\nFL4G{LF1_C0NF1G_4CC355}\n\ndb_host=localhost\ndb_user=admin\ndb_pass=super_secret_123\napi_key=sk_live_abc123def456\ndebug_mode=true',
+    '../../secret.txt': '=== CONFIDENTIAL SYSTEM INFORMATION ===\n\nFL4G{LF1_53CR3T_F1L3}\n\nAdmin passwords:\n- System: admin123\n- Database: db_pass_456\n- API: secret_key_789\n\nThis file contains sensitive system credentials.',
+    '/etc/passwd': '# User account information\nroot:x:0:0:root:/root:/bin/bash\nbin:x:1:1:bin:/bin:/sbin/nologin\ndaemon:x:2:2:daemon:/sbin:/sbin/nologin\nadm:x:3:4:adm:/var/adm:/sbin/nologin\nlp:x:4:7:lp:/var/spool/lpd:/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\n\nFL4G{LF1_5Y5T3M_F1L3}',
+    '/etc/hosts': '# Host file\n127.0.0.1   localhost\n127.0.1.1   hacksmith-server\n192.168.1.100   admin.hacksmith.local\n192.168.1.101   database.internal\n\nFL4G{LF1_H0ST5_F1L3}',
+    '../../../var/log/apache2/access.log': '192.168.1.1 - - [10/Mar/2024:12:34:56] "GET /admin" 200\n192.168.1.50 - - [10/Mar/2024:12:35:01] "POST /login" 401\n127.0.0.1 - - [10/Mar/2024:12:35:15] "GET /secret" 200\n\nFL4G{LF1_L0G_4CC355}',
+    '../../../../windows/system32/drivers/etc/hosts': '# Windows hosts file\n127.0.0.1       localhost\n::1             localhost\n192.168.1.100   admin-panel.local\n\nFL4G{LF1_W1ND0W5_F1L3}'
   } as Record<string, string>;
 
   const product = products[id as string];
@@ -401,7 +405,7 @@ export default function ProductDetail() {
               </div>
               <input
                 type="text"
-                placeholder={hintsVisible ? "Or enter file path (try: ../config.txt, ../../secret.txt)" : "Enter file path"}
+                placeholder={hintsVisible ? "Try: ../config.txt, /etc/passwd, ../../../var/log/apache2/access.log" : "Enter file path"}
                 className={`input-field text-sm mb-2 ${hintsVisible ? 'border-blue-500/50' : ''}`}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -436,7 +440,7 @@ export default function ProductDetail() {
               
               {hintsVisible && (
                 <div className="mt-2 text-xs text-red-400 opacity-75">
-                  File paths not validated
+                  💡 LFI Hint: File paths not validated - try ../config.txt, /etc/passwd, or log files
                 </div>
               )}
             </div>

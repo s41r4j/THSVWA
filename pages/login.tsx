@@ -65,17 +65,21 @@ export default function Login() {
     // SQL Injection vulnerability - check for bypass attempts
     if (username.includes("'") || username.includes('"') || username.includes(';') || 
         username.toLowerCase().includes('or') || username.includes('--') || 
-        username.includes('union') || username.includes('/*')) {
+        username.includes('union') || username.includes('/*') ||
+        password.includes("'") || password.includes('"') || password.includes(';') || 
+        password.toLowerCase().includes('or') || password.includes('--') || 
+        password.includes('union') || password.includes('/*')) {
       
-      // Simulate successful SQL injection bypass
-      if (username.toLowerCase().includes("'") && (
-          username.toLowerCase().includes('or') || 
-          username.toLowerCase().includes('1=1') ||
-          username.toLowerCase().includes('admin'))) {
+      // Simulate successful SQL injection bypass - More lenient conditions
+      if ((username.toLowerCase().includes("'") || password.toLowerCase().includes("'")) && (
+          username.toLowerCase().includes('or') || password.toLowerCase().includes('or') ||
+          username.toLowerCase().includes('1=1') || password.toLowerCase().includes('1=1') ||
+          username.includes('--') || password.includes('--') ||
+          username.toLowerCase().includes('admin') || password.toLowerCase().includes('admin'))) {
         
-        setMessage(`<div style="color: orange;">SQL Injection bypass successful!<br><strong>FL4G{5QL_1NJ3CT10N_5UCC355}</strong><br>Simulated Query: SELECT * FROM users WHERE username = '${username}' AND password = '${password}'<br>Admin access granted through SQL injection!</div>`);
+        setMessage(`<div style="color: orange;">🚨 SQL Injection bypass successful! 🚨<br><strong style="color: #ff7a00;">FL4G{5QL_1NJ3CT10N_5UCC355}</strong><br><br><strong>Vulnerable Query:</strong><br><code style="background: #333; padding: 4px; border-radius: 4px;">SELECT * FROM users WHERE username = '${username}' AND password = '${password}'</code><br><br><strong>Result:</strong> Admin access granted through SQL injection bypass!</div>`);
         setLoginAttempts(prev => [{
-          username,
+          username: username || 'sqli_attempt',
           timestamp,
           status: 'sqli'
         }, ...prev.slice(0, 4)]);
@@ -88,12 +92,12 @@ export default function Login() {
         
         setTimeout(() => {
           router.push('/profile');
-        }, 2000);
+        }, 3000);
         return;
       } else {
-        setMessage(`<div style="color: orange;">SQL Injection detected but bypass failed.<br>Query: SELECT * FROM users WHERE username = '${username}' AND password = '${password}'</div>`);
+        setMessage(`<div style="color: orange;">🔍 SQL Injection detected but bypass failed.<br><strong>Query:</strong> <code style="background: #333; padding: 2px;">SELECT * FROM users WHERE username = '${username}' AND password = '${password}'</code><br><strong>Tip:</strong> Try different SQL injection techniques!</div>`);
         setLoginAttempts(prev => [{
-          username,
+          username: username || 'sqli_failed',
           timestamp,
           status: 'sqli'
         }, ...prev.slice(0, 4)]);
@@ -139,12 +143,12 @@ export default function Login() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder={hintsVisible ? "Try: admin' OR '1'='1' --" : "Enter your username"}
                 className={`input-field ${hintsVisible ? 'border-orange-500/30 focus:border-orange-500' : ''}`}
               />
               {hintsVisible && (
                 <div className="mt-1 text-xs text-orange-400 opacity-75">
-                  SQL queries not sanitized
+                  💡 SQL Injection: Try ' OR 1=1 --, admin' OR '1'='1' --, or admin'#
                 </div>
               )}
             </div>
@@ -158,7 +162,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={hintsVisible ? "Try: ' OR 1=1 --" : "Enter your password"}
                   className="input-field pr-12"
                 />
                 <button
@@ -180,7 +184,7 @@ export default function Login() {
               </div>
               {hintsVisible && (
                 <div className="mt-1 text-xs text-yellow-400 opacity-75">
-                  Password visible - Brute force protection minimal
+                  💡 SQL Injection also works in password field: ' OR 1=1 --
                 </div>
               )}
             </div>
