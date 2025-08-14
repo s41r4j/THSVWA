@@ -165,13 +165,24 @@ docker start thsvwa-container
 - **Meta Tags**: Optimized for search engines
 - **Structured Data**: Educational content markup
 
+## 📚 Additional Resources
+
+- **[Help Center](/help)** - Complete setup instructions and system requirements
+- **[CTF Guide](/ctf-guide)** - Detailed vulnerability walkthroughs with hints
+- **[Security Documentation](/security-docs)** - Comprehensive security reference
+- **[Contact & Support](/contact)** - Get help and report issues
+
 ## 🤝 Contributing
+
+We welcome contributions to improve THSVWA! Please follow these guidelines:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/new-vulnerability`)
 3. Commit changes (`git commit -am 'Add new vulnerability'`)
 4. Push to branch (`git push origin feature/new-vulnerability`)
 5. Create a Pull Request
+
+For questions or support, visit our [Contact Page](/contact) or check the [Help Center](/help).
 
 ## 📄 License
 

@@ -2,7 +2,7 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/flag": "pages/flag.js",
-  "/": "pages/index.js",
-  "/product/[id]": "pages/product/[id].js"
+  "/ctf-guide": "pages/ctf-guide.js",
+  "/security-docs": "pages/security-docs.js",
+  "/contact": "pages/contact.js"
 }

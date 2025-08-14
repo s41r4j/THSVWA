@@ -170,15 +170,15 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
   const getColorClasses = () => {
     switch (type) {
       case 'flag':
-        return 'bg-gradient-to-r from-hacksmith-orange/90 to-yellow-500/90 border-hacksmith-orange text-white';
+        return 'bg-hacksmith-gray/95 border-hacksmith-orange/50 text-white';
       case 'success':
-        return 'bg-green-900/90 border-green-500 text-green-100';
+        return 'bg-hacksmith-gray/95 border-green-400/50 text-green-100';
       case 'warning':
-        return 'bg-yellow-900/90 border-yellow-500 text-yellow-100';
+        return 'bg-hacksmith-gray/95 border-yellow-400/50 text-yellow-100';
       case 'info':
-        return 'bg-blue-900/90 border-blue-500 text-blue-100';
+        return 'bg-hacksmith-gray/95 border-blue-400/50 text-blue-100';
       default:
-        return 'bg-gray-900/90 border-gray-500 text-gray-100';
+        return 'bg-hacksmith-gray/95 border-gray-400/50 text-gray-100';
     }
   };
 
@@ -189,20 +189,20 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
       
       <div
         className={`
-          fixed top-20 right-6 z-50 max-w-lg min-w-96 border-2 rounded-3xl shadow-2xl backdrop-blur-lg
+          fixed top-20 right-6 z-50 max-w-md min-w-80 border rounded-2xl shadow-xl backdrop-blur-sm
           transform transition-all duration-700 ease-out
           ${isVisible ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'}
           ${getColorClasses()}
         `}
       >
       {/* Header with enhanced styling */}
-      <div className="p-6 border-b border-white/20 relative overflow-hidden">
+      <div className="p-4 border-b border-white/10 relative overflow-hidden">
         {/* Background accent */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/3 to-transparent"></div>
         
         <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center space-x-4">
-            <div className="text-4xl p-3 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30 shadow-lg">
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl p-2 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20 shadow-sm">
               {getIcon()}
             </div>
             <div>

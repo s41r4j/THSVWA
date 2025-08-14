@@ -92,17 +92,26 @@ export default function ProductDetail() {
   const { hintsVisible } = useHints();
   const { showFlagNotification } = useNotifications();
   const [isReady, setIsReady] = useState(false);
+  const [idorTriggered, setIdorTriggered] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     if (router.isReady) {
       setIsReady(true);
       
-      // Show IDOR notification for product ID 0
-      if (id === '0') {
+      // Show IDOR notification for product ID 0 only once
+      if (id === '0' && !idorTriggered) {
+        setIdorTriggered(true);
+        setShowCelebration(true);
         showFlagNotification('FL4G{1D0R_4DM1N_4CC355}', 'IDOR', 'Admin Vault Discovered!');
+        
+        // Hide celebration after 5 seconds
+        setTimeout(() => {
+          setShowCelebration(false);
+        }, 5000);
       }
     }
-  }, [router.isReady, id, showFlagNotification]);
+  }, [router.isReady, id, showFlagNotification, idorTriggered]);
 
   const products = {
     '0': {
@@ -255,8 +264,8 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Special celebration for product ID 0 */}
-      {id === '0' && <CelebrationEffect />}
+      {/* Special celebration for product ID 0 - only show once */}
+      {id === '0' && showCelebration && <CelebrationEffect />}
 
       {/* Special reward page for product ID 0 */}
       {id === '0' ? (

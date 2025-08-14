@@ -110,12 +110,14 @@ export default function Layout({ children }: Props) {
                     className="btn-secondary text-sm flex items-center space-x-2"
                   >
                     {userInfo?.isAdmin ? (
-                      <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 6l3 6h5l-4 3 1.5 4.5L12 16.5 6.5 19.5 8 15l-4-3h5l3-6z"/>
+                      <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        <circle cx="18" cy="6" r="3" fill="currentColor" opacity="0.8"/>
+                        <text x="18" y="9" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">A</text>
                       </svg>
                     ) : (
                       <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     )}
                     <span>{userInfo?.username || 'Profile'}</span>
@@ -329,10 +331,10 @@ export default function Layout({ children }: Props) {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-hacksmith-orange">Support</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">CTF Guide</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Security Docs</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                <li><Link href="/help" className="text-gray-400 hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link href="/ctf-guide" className="text-gray-400 hover:text-white transition-colors">CTF Guide</Link></li>
+                <li><Link href="/security-docs" className="text-gray-400 hover:text-white transition-colors">Security Docs</Link></li>
+                <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
           </div>
