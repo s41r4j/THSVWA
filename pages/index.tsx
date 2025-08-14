@@ -39,6 +39,34 @@ export default function Home() {
       price: 65,
       image: '/assets/tongs.png',
       description: 'Precision forging tongs for gripping and manipulating hot metal pieces.'
+    },
+    {
+      id: 5,
+      name: 'Professional Chisel Set',
+      price: 95,
+      image: '/assets/chisels.png',
+      description: 'Complete set of high-quality chisels for detailed metalwork and engraving.'
+    },
+    {
+      id: 6,
+      name: 'Fire Forge Bucket',
+      price: 180,
+      image: '/assets/forge_fire_bucket.png',
+      description: 'Portable coal forge bucket perfect for heating metals to forging temperature.'
+    },
+    {
+      id: 7,
+      name: 'Steel Punches & Drifts',
+      price: 75,
+      image: '/assets/punches.png',
+      description: 'Essential punch and drift set for creating holes and shaping metal.'
+    },
+    {
+      id: 8,
+      name: 'Heavy-Duty Bench Vise',
+      price: 220,
+      image: '/assets/vise.png',
+      description: 'Robust bench vise for secure workpiece holding during forging operations.'
     }
   ];
 

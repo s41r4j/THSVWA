@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Layout from '../../components/Layout';
 import { useHints } from '../../contexts/HintContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 
@@ -87,8 +88,7 @@ function CelebrationEffect() {
 
 export default function ProductDetail() {
   const router = useRouter();
-  const { id, file } = router.query;
-  const [fileContent, setFileContent] = useState('');
+  const { id } = router.query;
   const { hintsVisible } = useHints();
   const { showFlagNotification } = useNotifications();
   const [isReady, setIsReady] = useState(false);
@@ -239,64 +239,40 @@ export default function ProductDetail() {
     }
   } as Record<string, any>;
 
-  // LFI Vulnerability - Simulated file inclusion with realistic system files
-  const files = {
-    'info.txt': 'Product documentation:\n\nThis file contains basic product information and usage guidelines.\n\nCreated: 2024-01-15\nLast Modified: 2024-03-10\nVersion: 1.2',
-    'specs.txt': 'Technical Specifications:\n\nMaterial: High-grade steel\nDimensions: Variable by product\nManufacturer: Hacksmith Industries\nCompliance: ISO 9001',
-    '../config.txt': '# Application Configuration File\n# WARNING: This file should not be publicly accessible\n\nFL4G{LF1_C0NF1G_4CC355}\n\ndb_host=localhost\ndb_user=admin\ndb_pass=super_secret_123\napi_key=sk_live_abc123def456\ndebug_mode=true',
-    '../../secret.txt': '=== CONFIDENTIAL SYSTEM INFORMATION ===\n\nFL4G{LF1_53CR3T_F1L3}\n\nAdmin passwords:\n- System: admin123\n- Database: db_pass_456\n- API: secret_key_789\n\nThis file contains sensitive system credentials.',
-    '/etc/passwd': '# User account information\nroot:x:0:0:root:/root:/bin/bash\nbin:x:1:1:bin:/bin:/sbin/nologin\ndaemon:x:2:2:daemon:/sbin:/sbin/nologin\nadm:x:3:4:adm:/var/adm:/sbin/nologin\nlp:x:4:7:lp:/var/spool/lpd:/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\n\nFL4G{LF1_5Y5T3M_F1L3}',
-    '/etc/hosts': '# Host file\n127.0.0.1   localhost\n127.0.1.1   hacksmith-server\n192.168.1.100   admin.hacksmith.local\n192.168.1.101   database.internal\n\nFL4G{LF1_H0ST5_F1L3}',
-    '../../../var/log/apache2/access.log': '192.168.1.1 - - [10/Mar/2024:12:34:56] "GET /admin" 200\n192.168.1.50 - - [10/Mar/2024:12:35:01] "POST /login" 401\n127.0.0.1 - - [10/Mar/2024:12:35:15] "GET /secret" 200\n\nFL4G{LF1_L0G_4CC355}',
-    '../../../../windows/system32/drivers/etc/hosts': '# Windows hosts file\n127.0.0.1       localhost\n::1             localhost\n192.168.1.100   admin-panel.local\n\nFL4G{LF1_W1ND0W5_F1L3}'
-  } as Record<string, string>;
-
   const product = products[id as string];
-
-  // Handle LFI vulnerability
-  const handleFileLoad = () => {
-    if (file && typeof file === 'string') {
-      const content = files[file] || 'File not found or access denied.';
-      setFileContent(content);
-      
-      // Check for LFI flags and show notifications
-      if (content.includes('FL4G{LF1_')) {
-        const flagMatch = content.match(/FL4G\{[^}]+\}/);
-        if (flagMatch) {
-          showFlagNotification(flagMatch[0], 'LFI', 'File Inclusion Exploited!');
-        }
-      }
-    }
-  };
 
   if (!isReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4">◐</div>
-          <p className="text-gray-400">Loading...</p>
+      <Layout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-4xl mb-4">◐</div>
+            <p className="text-gray-400">Loading...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   if (id && !product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
-          <h1 className="text-2xl font-bold text-hacksmith-orange mb-2">Product Not Found</h1>
-          <p className="text-gray-400 mb-6">
-            {hintsVisible ? 
-              "Try different product IDs (1-4) or check for hidden products (hint: try larger numbers)" :
-              "The requested product could not be found"
-            }
-          </p>
-          <Link href="/" className="btn-primary">
-            Back to Home
-          </Link>
+      <Layout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4">❌</div>
+            <h1 className="text-2xl font-bold text-hacksmith-orange mb-2">Product Not Found</h1>
+            <p className="text-gray-400 mb-6">
+              {hintsVisible ? 
+                "Try different product IDs (1-8) or check for hidden products (hint: try larger numbers)" :
+                "The requested product could not be found"
+              }
+            </p>
+            <Link href="/" className="btn-primary">
+              Back to Home
+            </Link>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
@@ -306,147 +282,75 @@ export default function ProductDetail() {
 
   // Product detail view
   return (
-    <div className="min-h-screen">
-      {/* Breadcrumb */}
-      <div className="bg-hacksmith-gray py-4">
-        <div className="max-w-6xl mx-auto px-6">
-          <Link href="/" className="text-hacksmith-orange hover:underline">Home</Link>
-          <span className="mx-2 text-gray-400">/</span>
-          <span className="text-white">{product.name}</span>
-        </div>
-      </div>
-
-      {/* Special celebration for product ID 0 - only show once */}
-      {id === '0' && showCelebration && <CelebrationEffect />}
-
-      {/* Regular product view for all products including ID 0 */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div>
-            <div className="bg-white rounded-xl p-8 flex items-center justify-center h-96">
-              <img 
-                src={product.image} 
-                alt={product.name}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
+    <Layout>
+      <div>
+        {/* Breadcrumb */}
+        <div className="bg-hacksmith-gray py-4">
+          <div className="max-w-6xl mx-auto px-6">
+            <Link href="/" className="text-hacksmith-orange hover:underline">Home</Link>
+            <span className="mx-2 text-gray-400">/</span>
+            <span className="text-white">{product.name}</span>
           </div>
+        </div>
 
-          {/* Product Info */}
-          <div className="space-y-6">
+        {/* Special celebration for product ID 0 - only show once */}
+        {id === '0' && showCelebration && <CelebrationEffect />}
+
+        {/* Regular product view for all products including ID 0 */}
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Product Image */}
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-hacksmith-orange mb-4">
-                ${product.price}
+              <div className="bg-white rounded-xl p-8 flex items-center justify-center h-96">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="max-h-full max-w-full object-contain"
+                />
               </div>
-              {hintsVisible && (
-                <div className="mt-2 text-xs text-blue-400 opacity-75">
-                  Product ID: {id}
+            </div>
+
+            {/* Product Info */}
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
+                <div className="text-3xl font-bold text-hacksmith-orange mb-4">
+                  ${product.price}
                 </div>
-              )}
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-hacksmith-orange mb-2">Description</h3>
-              <p className="text-gray-300 leading-relaxed">{product.description}</p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-hacksmith-orange mb-3">Specifications</h3>
-              <div className="space-y-2">
-                {Object.entries(product.specs).map(([key, value]) => (
-                  <div key={key} className="flex justify-between border-b border-gray-700 pb-1">
-                    <span className="text-gray-400">{key}:</span>
-                    <span className="text-white">{value as string}</span>
+                {hintsVisible && (
+                  <div className="mt-2 text-xs text-blue-400 opacity-75">
+                    Product ID: {id}
                   </div>
-                ))}
+                )}
               </div>
-            </div>
 
-            {/* LFI Section */}
-            <div className={`card bg-blue-900/20 border-blue-500 ${hintsVisible ? 'border-blue-400' : 'border-blue-800'}`}>
-              <h3 className="text-lg font-semibold text-blue-400 mb-3">Product Files</h3>
-              <p className="text-sm text-blue-300 mb-3">
-                Load additional product information files:
-              </p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                <button 
-                  onClick={() => router.push(`/product/${id}?file=info.txt`)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-                >
-                  info.txt
-                </button>
-                <button 
-                  onClick={() => router.push(`/product/${id}?file=specs.txt`)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-                >
-                  specs.txt
-                </button>
+              <div>
+                <h3 className="text-lg font-semibold text-hacksmith-orange mb-2">Description</h3>
+                <p className="text-gray-300 leading-relaxed">{product.description}</p>
               </div>
-              <input
-                type="text"
-                placeholder={hintsVisible ? "Try: ../config.txt, /etc/passwd, ../../../var/log/apache2/access.log" : "Enter file path"}
-                className={`input-field text-sm mb-2 ${hintsVisible ? 'border-blue-500/50' : ''}`}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    const target = e.target as HTMLInputElement;
-                    router.push(`/product/${id}?file=${target.value}`);
-                  }
-                }}
-              />
+
+              <div>
+                <h3 className="text-lg font-semibold text-hacksmith-orange mb-3">Specifications</h3>
+                <div className="space-y-2">
+                  {Object.entries(product.specs).map(([key, value]) => (
+                    <div key={key} className="flex justify-between border-b border-gray-700 pb-1">
+                      <span className="text-gray-400">{key}:</span>
+                      <span className="text-white">{value as string}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <button 
-                onClick={handleFileLoad}
-                className="btn-primary text-sm w-full"
+                onClick={() => router.push(`/purchase?product=${id}`)}
+                className="btn-primary w-full text-lg py-3"
               >
-                Load File
+                Buy Now - ${product.price}
               </button>
-              
-              {file && (
-                <div className={`mt-3 p-3 bg-hacksmith-dark rounded border ${hintsVisible ? 'border-red-500/30' : ''}`}>
-                  <p className="text-xs text-gray-400 mb-2">File: {file}</p>
-                  <pre className={`text-sm whitespace-pre-wrap ${
-                    fileContent.includes('FL4G{') ? 'text-hacksmith-orange' : 'text-green-400'
-                  }`}>
-                    {files[file as string] || 'File not found or access denied.'}
-                  </pre>
-                </div>
-              )}
-              
-              {hintsVisible && (
-                <p className="text-xs text-blue-400 mt-2">
-                  This demonstrates Local File Inclusion (LFI) vulnerability
-                </p>
-              )}
-              
-              {hintsVisible && (
-                <div className="mt-2 text-xs text-red-400 opacity-75">
-                  💡 LFI Hint: File paths not validated - try ../config.txt, /etc/passwd, or log files
-                </div>
-              )}
             </div>
-
-            <button className="btn-primary w-full">
-              Add to Cart - ${product.price}
-            </button>
           </div>
         </div>
-
-        {/* IDOR Hints */}
-        {hintsVisible && (
-          <div className="mt-16 card bg-yellow-900/20 border-yellow-500">
-            <h3 className="text-lg font-semibold text-yellow-400 mb-3">Security Testing</h3>
-            <p className="text-sm text-yellow-300 mb-2">
-              This page contains IDOR vulnerabilities. Try:
-            </p>
-            <ul className="text-sm text-yellow-300 list-disc pl-4">
-              <li>Changing the ID parameter in the URL</li>
-              <li>Trying different number ranges (1-4 are normal, try others)</li>
-              <li>Looking for admin or hidden products</li>
-            </ul>
-          </div>
-        )}
       </div>
-    </div>
+    </Layout>
   );
 }
