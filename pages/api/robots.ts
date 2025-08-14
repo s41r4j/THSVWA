@@ -10,20 +10,34 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 Allow: /
 
 # Sitemap
-Sitemap: ${baseUrl}/api/sitemap
+Sitemap: ${baseUrl}/sitemap.xml
 
-# Security-related paths (for educational CTF purposes)
+# Educational CTF - Security-related paths
+# These paths are intentionally listed for educational vulnerability discovery
 Disallow: /admin
 Disallow: /config
 Disallow: /backup
 Disallow: /.env
 Disallow: /secrets
+Disallow: /hidden
+Disallow: /internal
 
 # Allow crawling of vulnerable endpoints for educational demonstration
 Allow: /login
 Allow: /profile
 Allow: /flag
-Allow: /product/`;
+Allow: /terms
+Allow: /purchase
+Allow: /product/
+
+# Educational hint for IDOR testing
+# Try product IDs: 0, 999, negative numbers, or beyond normal range (1-8)
+
+# LFI testing hints in purchase flow
+# Explore file parameter: ?file=../../../etc/passwd
+
+# XSS testing available in homepage search
+# SQL injection opportunities in login form`;
 
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');

@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Layout from '../../components/Layout';
 import { useHints } from '../../contexts/HintContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 
@@ -243,36 +242,32 @@ export default function ProductDetail() {
 
   if (!isReady) {
     return (
-      <Layout>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-4xl mb-4">◐</div>
-            <p className="text-gray-400">Loading...</p>
-          </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">◐</div>
+          <p className="text-gray-400">Loading...</p>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   if (id && !product) {
     return (
-      <Layout>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">❌</div>
-            <h1 className="text-2xl font-bold text-hacksmith-orange mb-2">Product Not Found</h1>
-            <p className="text-gray-400 mb-6">
-              {hintsVisible ? 
-                "Try different product IDs (1-8) or check for hidden products (hint: try larger numbers)" :
-                "The requested product could not be found"
-              }
-            </p>
-            <Link href="/" className="btn-primary">
-              Back to Home
-            </Link>
-          </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h1 className="text-2xl font-bold text-hacksmith-orange mb-2">Product Not Found</h1>
+          <p className="text-gray-400 mb-6">
+            {hintsVisible ? 
+              "Try different product IDs (1-8) or check for hidden products (hint: try larger numbers)" :
+              "The requested product could not be found"
+            }
+          </p>
+          <Link href="/" className="btn-primary">
+            Back to Home
+          </Link>
         </div>
-      </Layout>
+      </div>
     );
   }
 
@@ -282,75 +277,64 @@ export default function ProductDetail() {
 
   // Product detail view
   return (
-    <Layout>
-      <div>
-        {/* Breadcrumb */}
-        <div className="bg-hacksmith-gray py-4">
-          <div className="max-w-6xl mx-auto px-6">
-            <Link href="/" className="text-hacksmith-orange hover:underline">Home</Link>
-            <span className="mx-2 text-gray-400">/</span>
-            <span className="text-white">{product.name}</span>
+    <div>
+      {/* Special celebration for product ID 0 - only show once */}
+      {id === '0' && showCelebration && <CelebrationEffect />}
+
+      {/* Regular product view for all products including ID 0 */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Image */}
+          <div>
+            <div className="bg-white rounded-xl p-8 flex items-center justify-center h-96">
+              <img 
+                src={product.image} 
+                alt={product.name}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Special celebration for product ID 0 - only show once */}
-        {id === '0' && showCelebration && <CelebrationEffect />}
-
-        {/* Regular product view for all products including ID 0 */}
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Image */}
+          {/* Product Info */}
+          <div className="space-y-6">
             <div>
-              <div className="bg-white rounded-xl p-8 flex items-center justify-center h-96">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="max-h-full max-w-full object-contain"
-                />
+              <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
+              <div className="text-3xl font-bold text-hacksmith-orange mb-4">
+                ${product.price}
               </div>
+              {hintsVisible && (
+                <div className="mt-2 text-xs text-blue-400 opacity-75">
+                  Product ID: {id}
+                </div>
+              )}
             </div>
 
-            {/* Product Info */}
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
-                <div className="text-3xl font-bold text-hacksmith-orange mb-4">
-                  ${product.price}
-                </div>
-                {hintsVisible && (
-                  <div className="mt-2 text-xs text-blue-400 opacity-75">
-                    Product ID: {id}
+            <div>
+              <h3 className="text-lg font-semibold text-hacksmith-orange mb-2">Description</h3>
+              <p className="text-gray-300 leading-relaxed">{product.description}</p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-hacksmith-orange mb-3">Specifications</h3>
+              <div className="space-y-2">
+                {Object.entries(product.specs).map(([key, value]) => (
+                  <div key={key} className="flex justify-between border-b border-gray-700 pb-1">
+                    <span className="text-gray-400">{key}:</span>
+                    <span className="text-white">{value as string}</span>
                   </div>
-                )}
+                ))}
               </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-hacksmith-orange mb-2">Description</h3>
-                <p className="text-gray-300 leading-relaxed">{product.description}</p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-hacksmith-orange mb-3">Specifications</h3>
-                <div className="space-y-2">
-                  {Object.entries(product.specs).map(([key, value]) => (
-                    <div key={key} className="flex justify-between border-b border-gray-700 pb-1">
-                      <span className="text-gray-400">{key}:</span>
-                      <span className="text-white">{value as string}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button 
-                onClick={() => router.push(`/purchase?product=${id}`)}
-                className="btn-primary w-full text-lg py-3"
-              >
-                Buy Now - ${product.price}
-              </button>
             </div>
+
+            <button 
+              onClick={() => router.push(`/purchase?product=${id}`)}
+              className="btn-primary w-full text-lg py-3"
+            >
+              Buy Now - ${product.price}
+            </button>
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }

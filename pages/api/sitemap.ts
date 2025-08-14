@@ -10,9 +10,12 @@ const generateSitemap = () => {
     '/login',
     '/profile',
     '/flag',
+    '/terms',
+    '/purchase',
   ];
 
-  const productPages = [1, 2, 3, 4, 5].map(id => `/product/${id}`);
+  // Include all 8 products plus hidden IDOR product
+  const productPages = [1, 2, 3, 4, 5, 6, 7, 8, 0].map(id => `/product/${id}`);
 
   const allPages = [...staticPages, ...productPages];
 
@@ -20,8 +23,22 @@ const generateSitemap = () => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${allPages.map(page => {
     const url = `${baseUrl}${page}`;
-    const priority = page === '' ? '1.0' : page.includes('/product/') ? '0.7' : '0.8';
-    const changefreq = page === '' ? 'weekly' : page.includes('/product/') ? 'monthly' : 'monthly';
+    let priority = '0.6';
+    let changefreq = 'monthly';
+    
+    if (page === '') {
+      priority = '1.0';
+      changefreq = 'weekly';
+    } else if (page === '/login') {
+      priority = '0.8';
+    } else if (page.includes('/product/')) {
+      priority = page.includes('/product/0') ? '0.3' : '0.7';
+    } else if (page === '/purchase') {
+      priority = '0.7';
+    } else if (page === '/flag' || page === '/terms') {
+      priority = '0.4';
+      changefreq = 'rarely';
+    }
     
     return `
   <url>
