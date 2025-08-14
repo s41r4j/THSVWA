@@ -98,10 +98,11 @@ interface NotificationItemProps {
   duration?: number;
   vulnerabilityType?: string;
   points?: number;
+  status?: string;
   onRemove: (id: string) => void;
 }
 
-function NotificationItem({ id, type, title, message, flag, duration = 60000, vulnerabilityType, points, onRemove }: NotificationItemProps) {
+function NotificationItem({ id, type, title, message, flag, duration = 60000, vulnerabilityType, points, status, onRemove }: NotificationItemProps) {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -201,12 +202,12 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
         <div className="absolute inset-0 bg-gradient-to-r from-white/3 to-transparent"></div>
         
         <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 flex-1">
             <div className="text-2xl p-2 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20 shadow-sm">
               {getIcon()}
             </div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">{title}</h3>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-lg mb-1 truncate">{title}</h3>
               {vulnerabilityType && (
                 <div className="flex items-center space-x-2">
                   <span className="text-xs opacity-90 uppercase tracking-widest font-semibold bg-white/10 px-2 py-1 rounded-full border border-white/15">
@@ -216,14 +217,27 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
               )}
             </div>
           </div>
-          <button
-            onClick={() => onRemove(id)}
-            className="text-white/60 hover:text-white transition-all duration-200 p-3 hover:bg-white/15 rounded-xl backdrop-blur-sm"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          
+          {/* Points and Status section */}
+          <div className="flex items-center space-x-3 ml-4">
+            {status && (
+              <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
+                status === 'SUCCESS' ? 'bg-green-500 text-white' :
+                status === 'FAILED' ? 'bg-red-500 text-white' :
+                'bg-gray-500 text-white'
+              }`}>
+                {status}
+              </span>
+            )}
+            <button
+              onClick={() => onRemove(id)}
+              className="text-white/60 hover:text-white transition-all duration-200 p-2 hover:bg-white/15 rounded-lg backdrop-blur-sm"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -250,7 +264,7 @@ function NotificationItem({ id, type, title, message, flag, duration = 60000, vu
                 Copy
               </button>
             </div>
-            <code className="text-lg font-mono break-all select-all block bg-black/30 p-3 rounded-lg border border-white/10 backdrop-blur-sm relative z-10">
+            <code className="text-lg font-mono break-all select-all block bg-black/30 p-3 rounded-lg border border-white/10 backdrop-blur-sm relative z-10 text-hacksmith-orange">
               {flag}
             </code>
           </div>

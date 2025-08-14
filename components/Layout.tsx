@@ -18,29 +18,26 @@ export default function Layout({ children }: Props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<{username: string, isAdmin: boolean} | null>(null);
   const [showFirstTimeHint, setShowFirstTimeHint] = useState(false);
-  const [hintTimeLeft, setHintTimeLeft] = useState(12);
   const { hintsVisible, toggleHints } = useHints();
 
   // Check if user is visiting for the first time
   useEffect(() => {
     const hasVisited = localStorage.getItem('thsvwa_has_visited');
+    console.log('Has visited check:', hasVisited); // Debug log
+    
     if (!hasVisited) {
+      console.log('First time visitor - showing hint'); // Debug log
       setShowFirstTimeHint(true);
       localStorage.setItem('thsvwa_has_visited', 'true');
       
-      // Start countdown timer
-      const countdown = setInterval(() => {
-        setHintTimeLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(countdown);
-            setShowFirstTimeHint(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      // Hide hint after 3 seconds
+      const timeout = setTimeout(() => {
+        setShowFirstTimeHint(false);
+      }, 3000);
       
-      return () => clearInterval(countdown);
+      return () => clearTimeout(timeout);
+    } else {
+      console.log('User has visited before - no hint'); // Debug log
     }
   }, []);
 
@@ -359,6 +356,7 @@ export default function Layout({ children }: Props) {
                 <li><Link href="/help" className="text-gray-400 hover:text-white transition-colors">Help Center</Link></li>
                 <li><Link href="/ctf-guide" className="text-gray-400 hover:text-white transition-colors">CTF Guide</Link></li>
                 <li><Link href="/security-docs" className="text-gray-400 hover:text-white transition-colors">Security Docs</Link></li>
+                <li><Link href="/terms" className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
                 <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
@@ -377,27 +375,12 @@ export default function Layout({ children }: Props) {
 
       {/* First Time Visitor Hint */}
       {showFirstTimeHint && (
-        <div className="fixed inset-0 z-40 pointer-events-none">
+        <div className="fixed inset-0 z-[60] pointer-events-none">
           {/* Subtle overlay */}
           <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
           
           {/* Hint content */}
-          <div className="absolute bottom-24 right-6 flex items-center space-x-3 pointer-events-auto">
-            {/* Animated arrow pointing to hint button */}
-            <div className="relative">
-              <div className="animate-bounce">
-                <svg className="w-8 h-8 text-hacksmith-orange drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M7 10l5 5 5-5z"/>
-                </svg>
-              </div>
-              {/* Pulsing glow effect */}
-              <div className="absolute inset-0 animate-ping">
-                <svg className="w-8 h-8 text-hacksmith-orange/50" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M7 10l5 5 5-5z"/>
-                </svg>
-              </div>
-            </div>
-            
+          <div className="absolute bottom-24 right-2 flex items-center space-x-3 pointer-events-auto">
             {/* Hint text */}
             <div className="bg-hacksmith-gray/95 border border-hacksmith-orange/50 rounded-xl px-4 py-3 shadow-2xl backdrop-blur-sm max-w-xs relative">
               {/* Close button */}
@@ -417,8 +400,20 @@ export default function Layout({ children }: Props) {
               <p className="text-xs text-gray-300 leading-relaxed">
                 Click the hint button below to get helpful guidance while exploring vulnerabilities!
               </p>
-              <div className="mt-2 text-xs text-gray-500">
-                Disappears in {hintTimeLeft}s
+            </div>
+            
+            {/* Animated arrow pointing to hint button - shifted right */}
+            <div className="relative">
+              <div className="animate-bounce">
+                <svg className="w-8 h-8 text-hacksmith-orange drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </div>
+              {/* Pulsing glow effect */}
+              <div className="absolute inset-0 animate-ping">
+                <svg className="w-8 h-8 text-hacksmith-orange/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
               </div>
             </div>
           </div>

@@ -117,7 +117,7 @@ export default function ProductDetail() {
     '0': {
       name: 'CLASSIFIED: Master Forge System',
       price: 99999,
-      image: '/assets/anvil.png',
+      image: '/assets/topsecret.png',
       description: '⚠️ RESTRICTED ACCESS ⚠️ This is a classified, high-security metalworking system reserved for authorized personnel only. Access to this product indicates a security vulnerability has been exploited.',
       flag: 'FL4G{1D0R_4DM1N_4CC355}',
       specs: {
@@ -175,6 +175,54 @@ export default function ProductDetail() {
         'Material': 'Carbon steel',
         'Jaw Width': '2 inches',
         'Weight': '1.8 lbs'
+      }
+    },
+    '5': {
+      name: 'Professional Chisel Set',
+      price: 95,
+      image: '/assets/chisels.png',
+      description: 'Complete set of high-quality chisels for detailed metalwork and engraving. Each chisel is forged from premium tool steel with hardened cutting edges.',
+      specs: {
+        'Set Size': '8 pieces',
+        'Material': 'Tool steel',
+        'Handle': 'Ergonomic grip',
+        'Edge Hardness': 'HRC 60-62'
+      }
+    },
+    '6': {
+      name: 'Fire Forge Bucket',
+      price: 180,
+      image: '/assets/forge_fire_bucket.png',
+      description: 'Portable coal forge bucket perfect for heating metals to forging temperature. Features reinforced steel construction and adjustable air flow.',
+      specs: {
+        'Capacity': '5 gallons',
+        'Material': 'Heat-resistant steel',
+        'Temperature Range': 'Up to 2100°F',
+        'Air Bellows': 'Manual operation'
+      }
+    },
+    '7': {
+      name: 'Steel Punches & Drifts',
+      price: 75,
+      image: '/assets/punches.png',
+      description: 'Essential punch and drift set for creating holes and shaping metal. Precision-ground tips ensure clean, accurate work every time.',
+      specs: {
+        'Set Size': '6 pieces',
+        'Material': 'Hardened steel',
+        'Sizes': '1/8" to 1/2"',
+        'Handle': 'Knurled grip'
+      }
+    },
+    '8': {
+      name: 'Heavy-Duty Bench Vise',
+      price: 220,
+      image: '/assets/vise.png',
+      description: 'Robust bench vise for secure workpiece holding during forging operations. Cast iron construction with precision-machined jaws.',
+      specs: {
+        'Jaw Width': '6 inches',
+        'Opening': '8 inches maximum',
+        'Weight': '45 lbs',
+        'Base': 'Swivel mounting'
       }
     },
     // IDOR Vulnerability - Hidden/Admin products
@@ -271,75 +319,8 @@ export default function ProductDetail() {
       {/* Special celebration for product ID 0 - only show once */}
       {id === '0' && showCelebration && <CelebrationEffect />}
 
-      {/* Special reward page for product ID 0 */}
-      {id === '0' ? (
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center space-y-8">
-            {/* Celebration Header */}
-            <div className="bg-gradient-to-r from-green-900/50 to-hacksmith-orange/50 rounded-2xl p-8 border border-hacksmith-orange">
-              <div className="text-6xl mb-4">🎉</div>
-              <h1 className="text-4xl font-bold text-hacksmith-orange mb-4 animate-pulse">
-                IDOR VULNERABILITY DISCOVERED!
-              </h1>
-              <p className="text-xl text-green-400 mb-6">
-                Congratulations! You have successfully exploited an Insecure Direct Object Reference vulnerability!
-              </p>
-            </div>
-
-            {/* Flag Display */}
-            <div className="bg-hacksmith-dark border-2 border-hacksmith-orange rounded-xl p-6">
-              <h2 className="text-2xl font-bold text-hacksmith-orange mb-4">Your Reward Flag</h2>
-              <div className="bg-black border border-hacksmith-orange rounded-lg p-4 mb-4">
-                <code className="text-2xl font-bold text-hacksmith-orange break-all select-all">
-                  {product.flag}
-                </code>
-              </div>
-              <button 
-                onClick={() => navigator.clipboard.writeText(product.flag)}
-                className="btn-primary text-lg px-8 py-3"
-              >
-                📋 Copy Flag to Clipboard
-              </button>
-            </div>
-
-            {/* Educational Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="card bg-blue-900/20 border-blue-500">
-                <h3 className="text-xl font-bold text-blue-400 mb-3">What You Discovered</h3>
-                <ul className="text-left space-y-2 text-blue-300">
-                  <li>• <strong>Vulnerability:</strong> Insecure Direct Object Reference (IDOR)</li>
-                  <li>• <strong>Method:</strong> URL parameter manipulation</li>
-                  <li>• <strong>Risk:</strong> Unauthorized access to restricted resources</li>
-                  <li>• <strong>Impact:</strong> Access to admin-only products</li>
-                </ul>
-              </div>
-              
-              <div className="card bg-red-900/20 border-red-500">
-                <h3 className="text-xl font-bold text-red-400 mb-3">🛡️ How to Prevent</h3>
-                <ul className="text-left space-y-2 text-red-300">
-                  <li>• Implement proper access controls</li>
-                  <li>• Use session-based authorization</li>
-                  <li>• Validate user permissions for each request</li>
-                  <li>• Use indirect object references (UUIDs)</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/flag" className="btn-primary">
-                🚩 Submit This Flag
-              </Link>
-              <Link href="/" className="btn-secondary">
-                🏠 Back to Home
-              </Link>
-            </div>
-          </div>
-        </div>
-      ) : (
-        // Regular product view
-        // Regular product view
-        <div className="max-w-6xl mx-auto px-6 py-8">
+      {/* Regular product view for all products including ID 0 */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
           <div>
@@ -466,7 +447,6 @@ export default function ProductDetail() {
           </div>
         )}
       </div>
-      )}
     </div>
   );
 }

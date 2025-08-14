@@ -372,8 +372,8 @@ export default function FlagSubmit() {
                       <span className="font-mono text-gray-300 truncate mr-2 flex-1">
                         {submission.flag}
                       </span>
-                      <div className="flex items-center space-x-2">
-                        {submission.points && submission.points > 0 && (
+                      <div className="flex items-center gap-2">
+                        {submission.points !== undefined && submission.points > 0 && (
                           <span className="text-hacksmith-orange font-bold">+{submission.points}</span>
                         )}
                         <span className={`px-2 py-1 rounded text-xs ${
@@ -531,42 +531,43 @@ export default function FlagSubmit() {
                 </div>
               </div>
             )}
-
-            {/* Educational Notice */}
-            <div className="card bg-yellow-900/10 border-yellow-500/30">
-              <h3 className="text-lg font-semibold text-yellow-400 mb-3 flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-                </svg>
-                Ethical Hacking Notice
-              </h3>
-              <div className="text-sm text-yellow-300 space-y-2">
-                <p>
-                  This platform contains <strong>intentional vulnerabilities</strong> for educational purposes. 
-                  All techniques demonstrated here should only be used in:
-                </p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li>Authorized penetration testing environments</li>
-                  <li>Your own applications and systems</li>
-                  <li>Educational labs and CTF competitions</li>
-                  <li>Bug bounty programs with explicit permission</li>
-                </ul>
-                <p className="font-semibold flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-8h2v6h-2V9z"/>
-                  </svg>
-                  Never attempt these techniques on systems you don't own or lack explicit permission to test.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="mt-8 text-center">
-          <Link href="/" className="text-hacksmith-orange hover:underline">
-            ← Back to Vulnerability Testing Lab
-          </Link>
+        <div className="mt-8 text-center space-y-4">
+          {/* Reset Activity Button */}
+          <div>
+            <button
+              onClick={() => {
+                // Clear all stored data
+                setFoundFlags(new Set());
+                setSubmissionHistory([]);
+                
+                // Clear sessionStorage
+                sessionStorage.removeItem('thsvwa_found_flags');
+                sessionStorage.removeItem('thsvwa_submission_history');
+                
+                // Clear cookies
+                deleteCookie('thsvwa_found_flags');
+                
+                // Show confirmation
+                alert('Activity reset successfully! All discovered flags and submission history have been cleared.');
+              }}
+              className="btn-secondary px-6 py-2 text-sm"
+            >
+              <svg className="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 6l3 18h12l3-18H3zm8 0V4a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2h-5z"/>
+              </svg>
+              Reset Activity & Discovered Flags
+            </button>
+          </div>
+          
+          <div>
+            <Link href="/" className="text-hacksmith-orange hover:underline">
+              ← Back to Vulnerability Testing Lab
+            </Link>
+          </div>
         </div>
       </div>
     </div>
