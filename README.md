@@ -1,90 +1,188 @@
-# THSVWA
+# THSVWA 🛡️
 > **T**he **H**acksmith **S**hop **V**ulnerable **W**eb **A**pplication
 
-## Project Overview
+[![Next.js](https://img.shields.io/badge/Next.js-14.2.31-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](https://www.docker.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.13-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-Hacksmith Shop is a deliberately vulnerable web application designed as a simple e-commerce-style platform for educational Capture The Flag (CTF) challenges. Built to simulate real-world web security flaws, it provides a safe environment to explore and understand common vulnerabilities.
+## 🎯 Project Overview
 
-### Features
+THSVWA is a deliberately vulnerable web application designed as an interactive cybersecurity education platform. Built with modern web technologies, it simulates a realistic e-commerce environment while containing intentional security vulnerabilities for Capture The Flag (CTF) challenges and penetration testing practice.
 
-- **Simple E-commerce UI**: Clean, responsive design with black and orange Hacksmith branding
-- **Three Core Pages**: Focused structure with main page, tools, and user management
-- **Interactive CTF Challenges**: Multiple vulnerability types with educational context
-- **Authentication System**: Login functionality with hardcoded test users
-- **Educational Content**: Built-in security warnings and vulnerability explanations
+## ✨ Key Features
 
-### Application Structure
+### 🛍️ Modern E-commerce Interface
+- **Responsive Design**: Mobile-first layout with professional UI/UX
+- **Product Catalog**: Interactive blacksmithing tools showcase
+- **Search Functionality**: Real-time product search with XSS vulnerabilities
+- **Dynamic Routing**: Individual product pages with IDOR/LFI challenges
+- **Professional Navigation**: Clean header with hint mode toggle
 
-The application consists of three main pages:
+### 🔐 Security Education Platform
+- **Hint Mode System**: Toggle button to show/hide vulnerability indicators
+- **Real Vulnerabilities**: Authentic security flaws, not simulated
+- **CTF Challenges**: Multiple vulnerability types with hidden flags
+- **Educational Warnings**: Context-aware security indicators
+- **Progress Tracking**: Flag submission and discovery system
 
-1. **Main Page (/)**: Landing page displaying a list of blacksmithing tools with search functionality
-2. **Tools Page (/tools)**: Detailed tool information with product specifications
-3. **Login Page (/login)**: User authentication that redirects to profile
-4. **Profile Page (/profile)**: Simple user profile management (requires login)
+### 🐳 Production-Ready Deployment
+- **Docker Containerization**: Optimized multi-stage builds
+- **Port 80 Configuration**: Standard web server setup
+- **Security Hardening**: Non-root user, minimal attack surface
+- **SEO Optimization**: Sitemap, robots.txt, and meta tags
 
-### Development Workflow
+## 🚀 Quick Start
 
-- Develop a simple, interactive "Hacksmith Shop" web application
-- Embed intentional security vulnerabilities for learning purposes
-- Maintain clean, minimal design while preserving educational value
-- Containerize the application using Docker for isolated, reproducible deployment
+### Using Docker (Recommended)
 
-## Included Vulnerabilities
+```bash
+# Clone the repository
+git clone https://github.com/s41r4j/THSVWA.git
+cd THSVWA
 
-The application contains the following vulnerabilities, each hiding a flag for CTF participants:
+# Build and run with Docker
+docker build -t thsvwa .
+docker run -d -p 80:80 --name thsvwa-container thsvwa
 
-- **SQL Injection (SQLi)**: Exploit unsanitized database queries to manipulate data or uncover flags.
-- **Cross-Site Scripting (XSS)**: Inject malicious scripts to steal data or reveal hidden flags.
-- **Command Injection**: Execute arbitrary system commands through improper input handling.
-- **Insecure File Upload**: Upload malicious files to access restricted areas or flags.
-- **Insecure Direct Object Reference (IDOR)**: Access unauthorized resources by manipulating identifiers.
-- **Local File Inclusion (LFI)**: Exploit file inclusion to read sensitive files containing flags.
+# Access the application
+open http://localhost
+```
 
-## UI Features
+### Development Setup
 
-### Modern E-commerce Design
-- **Responsive Layout**: Mobile-first design that works on all device sizes
-- **Professional Navigation**: Sticky header with smooth navigation and mobile menu
-- **Product Showcase**: Featured products carousel with ratings, pricing, and stock status
-- **Interactive Elements**: Hover effects, animations, and smooth transitions
+```bash
+# Install dependencies
+npm install
 
-### Enhanced User Experience
-- **Search & Filter**: Advanced product filtering with category selection and sorting
-- **Product Details**: Comprehensive product pages with specifications and related items
-- **User Profile**: Complete profile management with real-time preview
-- **File Operations**: Professional file upload interface with drag-and-drop support
-- **Terminal Interface**: Realistic command execution terminal with syntax highlighting
+# Run development server
+npm run dev
 
-### Security Education
-- **Vulnerability Indicators**: Clear warnings about intentional security flaws
-- **CTF Hints**: Built-in hints and guidance for each challenge type
-- **Educational Content**: Explanations of vulnerabilities and their implications
-- **Progress Tracking**: Submission history and flag discovery tracking
+# Build for production
+npm run build
+npm start
+```
 
-## Setup Instructions
+## 🗺️ Application Structure
 
-1. **Clone the Repository**:
-   - Run: `git clone https://github.com/s41r4j/THSVWA.git`
-   - Navigate to the directory: `cd THSVWA`
+### Pages & Routes
+- **`/`** - Homepage with product catalog and search
+- **`/login`** - Authentication with SQL injection vulnerabilities
+- **`/profile`** - User profile management (requires login)
+- **`/flag`** - CTF flag submission endpoint
+- **`/product/[id]`** - Dynamic product pages with IDOR/LFI
 
-2. **Build and Run with Docker**:
-   - Build: `docker build -t hacksmith-shop .`
-   - Run: `docker run -p 8080:80 hacksmith-shop`
+### API Endpoints
+- **`/api/flag`** - Flag submission and validation
+- **`/api/sitemap`** - Dynamic sitemap generation
+- **`/api/robots`** - Robots.txt configuration
 
-3. **Access the Application**:
-   - Open `http://localhost:8080` in your browser.
+## 🎮 Included Vulnerabilities
 
-## Challenge Hints
+| Vulnerability | Location | Description | Educational Value |
+|---------------|----------|-------------|-------------------|
+| **Cross-Site Scripting (XSS)** | Homepage Search | Real JavaScript execution via `useEffect` | Learn DOM manipulation attacks |
+| **SQL Injection (SQLi)** | Login Form | Unsanitized database queries | Understand database security |
+| **Insecure Direct Object Reference (IDOR)** | Product Pages | Access control bypass via URL manipulation | Authorization flaw exploitation |
+| **Local File Inclusion (LFI)** | Product Pages | File system access simulation | Path traversal understanding |
 
-- **SQLi**: Check login or search forms for query manipulation opportunities.
-- **XSS**: Experiment with input fields that display user data.
-- **Command Injection**: Look for features executing system commands.
-- **Insecure File Upload**: Try uploading unexpected file types.
-- **IDOR**: Modify URL parameters to access hidden resources.
-- **LFI**: Test file inclusion endpoints with path traversal.
+## 🔑 Default Credentials
 
-## Notes
+| Username | Password | Role |
+|----------|----------|------|
+| `user` | `u53r` | Regular User |
+| `admin` | `4dm1n` | Administrator |
 
-- This application is for educational use only in a controlled environment.
-- Regularly commit changes to the repository to reflect development progress.
-- Submit flags via the `/flag` endpoint to score points in the CTF.
+## 🎛️ Hint Mode System
+
+The application features a professional hint toggle system:
+
+- **Toggle Button**: Click the hint icon (◉/◎) in the navigation
+- **Visual Indicators**: Shows vulnerability warnings when enabled
+- **Educational Context**: Provides learning guidance without spoiling challenges
+- **Smooth Animations**: Professional hover effects and transitions
+
+## 🐳 Docker Configuration
+
+### Container Details
+- **Base Image**: `node:20-alpine`
+- **Port**: 80 (standard HTTP)
+- **User**: Non-root (`nextjs:nodejs`)
+- **Environment**: Production optimized
+
+### Container Management
+```bash
+# View running containers
+docker ps
+
+# Check container logs
+docker logs thsvwa-container
+
+# Stop container
+docker stop thsvwa-container
+
+# Remove container
+docker rm thsvwa-container
+
+# Restart container
+docker start thsvwa-container
+```
+
+## 🔍 CTF Challenge Hints
+
+### 🔓 Getting Started
+1. **Enable Hint Mode**: Toggle the hint button to see vulnerability indicators
+2. **Explore Pages**: Each page contains different vulnerability types
+3. **Test Input Fields**: Try various payloads in search, login, and forms
+4. **Check URLs**: Manipulate parameters in product pages
+
+### 🎯 Specific Challenges
+- **XSS**: Use the homepage search to inject and execute JavaScript
+- **SQLi**: Test login form with SQL injection payloads
+- **IDOR**: Modify product IDs to access unauthorized resources
+- **LFI**: Explore file inclusion in product detail pages
+
+## 🛡️ Security Notes
+
+⚠️ **Educational Use Only**: This application contains intentional vulnerabilities
+- Deploy only in isolated, controlled environments
+- Never expose to public networks
+- Use for learning and authorized testing only
+- Regular security assessments recommended for educational environments
+
+## 🏗️ Technology Stack
+
+- **Framework**: Next.js 14.2.31 with TypeScript
+- **Styling**: Tailwind CSS 3.4.13
+- **Runtime**: Node.js 20 (Alpine Linux)
+- **Containerization**: Docker with multi-stage builds
+- **State Management**: React Context API
+
+## 📊 SEO & Crawling
+
+- **Sitemap**: Available at `/sitemap.xml` and `/api/sitemap`
+- **Robots.txt**: Available at `/robots.txt` and `/api/robots`
+- **Meta Tags**: Optimized for search engines
+- **Structured Data**: Educational content markup
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-vulnerability`)
+3. Commit changes (`git commit -am 'Add new vulnerability'`)
+4. Push to branch (`git push origin feature/new-vulnerability`)
+5. Create a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built for cybersecurity education and CTF challenges
+- Inspired by real-world security vulnerabilities
+- Designed for safe, controlled learning environments
+
+---
+
+**⚡ Ready to learn? Start your security journey at `http://localhost` after running the Docker container!**

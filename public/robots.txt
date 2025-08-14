@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: http://localhost/sitemap.xml
+
+# Security-related paths (for educational CTF purposes)
+Disallow: /admin
+Disallow: /config
+Disallow: /backup
+Disallow: /.env
+Disallow: /secrets
+
+# Allow crawling of vulnerable endpoints for educational demonstration
+Allow: /login
+Allow: /profile
+Allow: /flag
+Allow: /product/

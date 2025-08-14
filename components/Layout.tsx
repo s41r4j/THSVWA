@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useHints } from '../contexts/HintContext';
+import { NotificationProvider } from '../contexts/NotificationContext';
+import NotificationContainer from './NotificationContainer';
 
 type Props = { children: ReactNode };
 
@@ -12,13 +14,78 @@ const nav = [
 export default function Layout({ children }: Props) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState<{username: string, isAdmin: boolean} | null>(null);
   const { hintsVisible, toggleHints } = useHints();
 
+  // Check login status on component mount and when localStorage changes
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setIsLoggedIn(true);
+          setUserInfo(parsedUser);
+        } catch (error) {
+          setIsLoggedIn(false);
+          setUserInfo(null);
+        }
+      } else {
+        setIsLoggedIn(false);
+        setUserInfo(null);
+      }
+    };
+
+    // Initial check
+    checkLoginStatus();
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        checkLoginStatus();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically in case of same-tab changes
+    const interval = setInterval(checkLoginStatus, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (profileDropdownOpen && !target.closest('.profile-dropdown')) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [profileDropdownOpen]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setUserInfo(null);
+    setProfileDropdownOpen(false);
+    router.push('/');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-hacksmith-orange/20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
+    <NotificationProvider>
+      <div className="min-h-screen flex flex-col" data-hints-visible={hintsVisible}>
+        <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-hacksmith-orange/20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-hacksmith-orange rounded-lg flex items-center justify-center text-black font-bold group-hover:animate-glow transition-all">
@@ -36,15 +103,63 @@ export default function Layout({ children }: Props) {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/login" className="btn-secondary text-sm">
-                Login
-              </Link>
+              {isLoggedIn ? (
+                <div className="relative profile-dropdown">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="btn-secondary text-sm flex items-center space-x-2"
+                  >
+                    {userInfo?.isAdmin ? (
+                      <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 6l3 6h5l-4 3 1.5 4.5L12 16.5 6.5 19.5 8 15l-4-3h5l3-6z"/>
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    )}
+                    <span>{userInfo?.username || 'Profile'}</span>
+                    <svg className={`w-4 h-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-hacksmith-gray border border-hacksmith-orange/20 rounded-lg shadow-lg z-50 animate-in fade-in duration-200">
+                      <Link 
+                        href="/profile" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:text-hacksmith-orange hover:bg-hacksmith-light-gray transition-colors rounded-t-lg"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        View Profile
+                      </Link>
+                      <div className="border-t border-gray-600"></div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-red-400 hover:bg-hacksmith-light-gray transition-colors rounded-b-lg"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link href="/login" className="btn-secondary text-sm flex items-center space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Login</span>
+                </Link>
+              )}
               <Link href="/flag" className="btn-secondary text-sm">
                 Submit Flag
               </Link>
-              <button className="w-10 h-10 bg-hacksmith-light-gray rounded-lg flex items-center justify-center hover:bg-hacksmith-orange hover:text-black transition-colors">
-                ◎
-              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -65,13 +180,52 @@ export default function Layout({ children }: Props) {
             {/* Mobile navigation removed */}
             
             <div className="space-y-2">
-              <Link 
-                href="/login" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="block w-full text-center btn-secondary"
-              >
-                Login
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <div className="text-center text-gray-400 text-sm mb-2">
+                    Welcome, {userInfo?.username}!
+                  </div>
+                  <Link 
+                    href="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-center btn-secondary flex items-center justify-center space-x-2"
+                  >
+                    {userInfo?.isAdmin ? (
+                      <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 6l3 6h5l-4 3 1.5 4.5L12 16.5 6.5 19.5 8 15l-4-3h5l3-6z"/>
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    )}
+                    <span>View Profile</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="block w-full text-center btn-secondary bg-red-600 hover:bg-red-700 flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full text-center btn-secondary flex items-center justify-center space-x-2"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Login</span>
+                </Link>
+              )}
               <Link 
                 href="/flag" 
                 onClick={() => setMobileMenuOpen(false)}
@@ -87,32 +241,26 @@ export default function Layout({ children }: Props) {
       <main className="flex-1">{children}</main>
 
       {/* Global Hint Toggle Button */}
-      <div className="fixed bottom-6 right-6 z-50 group">
+      <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={toggleHints}
-          className={`relative overflow-hidden px-4 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 group-hover:px-6 ${
+          className={`relative overflow-hidden rounded-full font-semibold shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${
             hintsVisible 
               ? 'bg-hacksmith-orange text-black shadow-hacksmith-orange/25' 
               : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
-          }`}
+          } w-14 h-14 hover:w-48 hover:h-12 flex items-center justify-center group`}
         >
-          <div className="flex items-center space-x-2">
-            <span className="text-lg transition-transform duration-300 group-hover:rotate-12">
+          {/* Circle state (default) */}
+          <div className="flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+            <span className="text-xl">
               {hintsVisible ? '◉' : '◎'}
-            </span>
-            <span className="whitespace-nowrap transition-all duration-300">
-              Hint Mode: {hintsVisible ? 'ON' : 'OFF'}
             </span>
           </div>
           
-          {/* Expandable hint text on hover */}
-          <div className={`absolute left-0 top-0 w-full h-full flex items-center justify-center px-4 py-3 rounded-full transition-all duration-300 transform ${
-            hintsVisible 
-              ? 'bg-hacksmith-orange text-black' 
-              : 'bg-gray-700 text-gray-200'
-          } translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100`}>
+          {/* Expanded state (on hover) */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-4">
             <span className="text-sm font-medium whitespace-nowrap">
-              {hintsVisible ? '▼ Hide security hints' : '▲ Show security hints'}
+              Hint Mode: {hintsVisible ? 'ON' : 'OFF'}
             </span>
           </div>
         </button>
@@ -124,20 +272,32 @@ export default function Layout({ children }: Props) {
             {/* Company Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-hacksmith-orange rounded-lg flex items-center justify-center text-black font-bold">
-                  ⚡
-                </div>
                 <span className="text-xl font-bold text-hacksmith-orange">Hacksmith Shop</span>
               </div>
               <p className="text-gray-400 text-sm">
-                The ultimate destination for cybersecurity tools and Hacksmith merchandise. 
-                Built for educational CTF challenges.
+                The ultimate destination for blacksmithing tools and professional equipment.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">✉</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">≋</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">◈</a>
-                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">⬢</a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.223.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.758-1.378l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.624 0 11.99-5.367 11.99-11.987C24.007 5.367 18.641.001 12.017.001z"/>
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-hacksmith-orange transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
               </div>
             </div>
 
@@ -154,14 +314,14 @@ export default function Layout({ children }: Props) {
 
             {/* CTF Info */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-hacksmith-orange">CTF Challenges</h3>
+              <h3 className="text-lg font-semibold text-hacksmith-orange">Security Challenges</h3>
               <ul className="space-y-2 text-sm">
-                <li className="text-gray-400">◎ SQL Injection</li>
-                <li className="text-gray-400">⚡ XSS Scripting</li>
-                <li className="text-gray-400">◈ IDOR Vulnerabilities</li>
-                <li className="text-gray-400">□ File Inclusion (LFI)</li>
-                <li className="text-gray-400">◐ File Upload Bypass</li>
-                <li className="text-gray-400">▲ Input Validation</li>
+                <li className="text-gray-400">SQL Injection</li>
+                <li className="text-gray-400">XSS Scripting</li>
+                <li className="text-gray-400">IDOR Vulnerabilities</li>
+                <li className="text-gray-400">File Inclusion (LFI)</li>
+                <li className="text-gray-400">File Upload Bypass</li>
+                <li className="text-gray-400">Input Validation</li>
               </ul>
             </div>
 
@@ -179,7 +339,7 @@ export default function Layout({ children }: Props) {
 
           <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
             <div className="text-sm text-gray-400">
-              © {new Date().getFullYear()} Hacksmith Shop. Educational CTF platform.
+              © {new Date().getFullYear()} Hacksmith Shop. All rights reserved.
             </div>
             <div className="text-sm text-hacksmith-orange mt-2 md:mt-0">
               ⚠ Intentionally Vulnerable for Educational Purposes
@@ -187,7 +347,11 @@ export default function Layout({ children }: Props) {
           </div>
         </div>
       </footer>
+
+      {/* Notification Container */}
+      <NotificationContainer />
     </div>
+    </NotificationProvider>
   );
 }
 

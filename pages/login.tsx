@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useHints } from '../contexts/HintContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [loginAttempts, setLoginAttempts] = useState<{username: string, timestamp: string, status: string}[]>([]);
   const router = useRouter();
   const { hintsVisible } = useHints();
+  const { showFlagNotification } = useNotifications();
 
-  // Hardcoded users
-  const users = {
-    'u53r': { password: 'u53r', isAdmin: false },
-    'admin': { password: '4dm1n', isAdmin: true }
-  };
+  // Check if user is already logged in and redirect to profile
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      router.push('/profile');
+    }
+  }, [router]);
+
+  // Only admin user exists - vulnerable to SQL injection
+  const ADMIN_PASSWORD = '4dm1n';
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,43 +40,74 @@ export default function Login() {
       return;
     }
 
-    const user = users[username as keyof typeof users];
+    // SQL Injection Vulnerability - Simulated vulnerable SQL query
+    // This simulates: SELECT * FROM users WHERE username = '$username' AND password = '$password'
     
-    if (user && user.password === password) {
-      // Successful login
-      setMessage(`<div style="color: green;">Welcome back, <strong>${username}</strong>! Redirecting to profile...</div>`);
+    // Check for valid admin login first
+    if (username === 'admin' && password === ADMIN_PASSWORD) {
+      // Successful admin login
+      setMessage(`<div style="color: green;">Welcome back, Administrator! Redirecting to profile...</div>`);
       setLoginAttempts(prev => [{
         username,
         timestamp,
         status: 'success'
       }, ...prev.slice(0, 4)]);
       
-      // Store user session (simplified)
-      localStorage.setItem('user', JSON.stringify({ username, isAdmin: user.isAdmin }));
+      // Store admin session
+      localStorage.setItem('user', JSON.stringify({ username: 'admin', isAdmin: true }));
       
       setTimeout(() => {
         router.push('/profile');
       }, 1500);
-    } else {
-      // SQL Injection vulnerability for normal user, but secured for admin
-      if (username === 'admin') {
-        // Secured for admin - no SQL injection
-        setMessage(`<div style="color: red;">Invalid credentials for admin user.</div>`);
-      } else {
-        // SQL Injection vulnerability for normal users
-        if (username.includes("'") || username.includes('"') || username.includes(';')) {
-          setMessage(`<div style="color: orange;">SQL Injection detected for user: <strong>${username}</strong><br>FLAG{SQL_INJECTION_SUCCESS}<br>Query: SELECT * FROM users WHERE username = '${username}' AND password = '${password}'</div>`);
-        } else {
-          setMessage(`<div style="color: red;">Invalid credentials. User <strong>${username}</strong> not found or wrong password.</div>`);
-        }
-      }
-      
-      setLoginAttempts(prev => [{
-        username,
-        timestamp,
-        status: username.includes("'") || username.includes('"') ? 'sqli' : 'failed'
-      }, ...prev.slice(0, 4)]);
+      return;
     }
+
+    // SQL Injection vulnerability - check for bypass attempts
+    if (username.includes("'") || username.includes('"') || username.includes(';') || 
+        username.toLowerCase().includes('or') || username.includes('--') || 
+        username.includes('union') || username.includes('/*')) {
+      
+      // Simulate successful SQL injection bypass
+      if (username.toLowerCase().includes("'") && (
+          username.toLowerCase().includes('or') || 
+          username.toLowerCase().includes('1=1') ||
+          username.toLowerCase().includes('admin'))) {
+        
+        setMessage(`<div style="color: orange;">SQL Injection bypass successful!<br><strong>FL4G{5QL_1NJ3CT10N_5UCC355}</strong><br>Simulated Query: SELECT * FROM users WHERE username = '${username}' AND password = '${password}'<br>Admin access granted through SQL injection!</div>`);
+        setLoginAttempts(prev => [{
+          username,
+          timestamp,
+          status: 'sqli'
+        }, ...prev.slice(0, 4)]);
+        
+        // Show SQL injection notification
+        showFlagNotification('FL4G{5QL_1NJ3CT10N_5UCC355}', 'SQL Injection', 'SQL Injection Successful!');
+        
+        // Grant admin access through SQL injection
+        localStorage.setItem('user', JSON.stringify({ username: 'admin', isAdmin: true }));
+        
+        setTimeout(() => {
+          router.push('/profile');
+        }, 2000);
+        return;
+      } else {
+        setMessage(`<div style="color: orange;">SQL Injection detected but bypass failed.<br>Query: SELECT * FROM users WHERE username = '${username}' AND password = '${password}'</div>`);
+        setLoginAttempts(prev => [{
+          username,
+          timestamp,
+          status: 'sqli'
+        }, ...prev.slice(0, 4)]);
+        return;
+      }
+    }
+
+    // Normal failed login
+    setMessage(`<div style="color: red;">Invalid credentials. User <strong>${username}</strong> not found or wrong password.</div>`);
+    setLoginAttempts(prev => [{
+      username,
+      timestamp,
+      status: 'failed'
+    }, ...prev.slice(0, 4)]);
   };
 
   return (
@@ -105,7 +144,7 @@ export default function Login() {
               />
               {hintsVisible && (
                 <div className="mt-1 text-xs text-orange-400 opacity-75">
-                  ⚠ SQL queries not sanitized
+                  SQL queries not sanitized
                 </div>
               )}
             </div>
@@ -114,13 +153,36 @@ export default function Login() {
               <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Password
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="input-field"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="input-field pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-hacksmith-orange transition-colors"
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {hintsVisible && (
+                <div className="mt-1 text-xs text-yellow-400 opacity-75">
+                  Password visible - Brute force protection minimal
+                </div>
+              )}
             </div>
 
             <button type="submit" className="btn-primary w-full">
@@ -138,46 +200,10 @@ export default function Login() {
           
           {hintsVisible && message && (
             <div className="mt-2 text-xs text-red-400 opacity-75">
-              ⚠ Output not escaped
+              Output not escaped
             </div>
           )}
         </div>
-
-        {/* Test XSS Section */}
-        {hintsVisible && (
-          <div className="mt-6 card bg-red-900/20 border-red-500">
-            <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ XSS Testing</h3>
-            <p className="text-sm text-red-300 mb-2">
-              This login form is vulnerable to XSS. Try entering:
-            </p>
-            <ul className="text-sm text-red-300 list-disc pl-4 space-y-1">
-              <li><code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></li>
-              <li><code>&lt;img src=x onerror=alert('FLAG&#123;XSS_LOGIN&#125;')&gt;</code></li>
-              <li><code>&lt;svg onload=alert('XSS')&gt;</code></li>
-            </ul>
-            <p className="text-xs text-red-400 mt-2">
-              The vulnerability is in the error message display system.
-            </p>
-          </div>
-        )}
-
-        {/* SQL Injection Info */}
-        {hintsVisible && (
-          <div className="mt-6 card bg-blue-900/20 border-blue-500">
-            <h3 className="text-lg font-semibold text-blue-400 mb-3">🔍 SQL Injection Testing</h3>
-            <p className="text-sm text-blue-300 mb-2">
-              Try SQL injection payloads in the username field:
-            </p>
-            <ul className="text-sm text-blue-300 list-disc pl-4 space-y-1">
-              <li><code>' OR '1'='1</code></li>
-              <li><code>admin'; --</code></li>
-              <li><code>' UNION SELECT * FROM users; --</code></li>
-            </ul>
-            <p className="text-xs text-blue-400 mt-2">
-              Note: Admin user is protected from SQL injection, normal users are not.
-            </p>
-          </div>
-        )}
 
         {/* Login Attempts History */}
         {loginAttempts.length > 0 && (
@@ -209,23 +235,12 @@ export default function Login() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
               <div>
-                <div className="font-semibold text-white">Normal User</div>
-                <div className="text-gray-400">Username: <code>u53r</code></div>
-                <div className="text-gray-400">Password: <code>u53r</code></div>
-              </div>
-              {hintsVisible && (
-                <span className="text-yellow-400 text-xs">SQL Vulnerable</span>
-              )}
-            </div>
-            
-            <div className="flex justify-between items-center p-2 bg-hacksmith-light-gray rounded">
-              <div>
                 <div className="font-semibold text-white">Admin User</div>
                 <div className="text-gray-400">Username: <code>admin</code></div>
                 <div className="text-gray-400">Password: <code>4dm1n</code></div>
               </div>
               {hintsVisible && (
-                <span className="text-green-400 text-xs">SQL Protected</span>
+                <span className="text-red-400 text-xs">SQL Vulnerable</span>
               )}
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useHints } from '../contexts/HintContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 export default function Profile() {
   const [user, setUser] = useState<{username: string, isAdmin: boolean} | null>(null);
@@ -11,6 +12,7 @@ export default function Profile() {
   const [email, setEmail] = useState('');
   const router = useRouter();
   const { hintsVisible } = useHints();
+  const { showFlagNotification } = useNotifications();
 
   useEffect(() => {
     // Check if user is logged in
@@ -33,11 +35,14 @@ export default function Profile() {
     
     // Simulate file upload with intentional vulnerabilities
     if (fileName.includes('flag') || fileName.includes('admin')) {
-      setUploadStatus(`FLAG{INSECURE_UPLOAD} - File "${profileImage.name}" uploaded successfully! This demonstrates insecure file upload vulnerability.`);
+      setUploadStatus(`FL4G{1N53CUR3_UPL04D} - File "${profileImage.name}" uploaded successfully! This demonstrates insecure file upload vulnerability.`);
+      showFlagNotification('FL4G{1N53CUR3_UPL04D}', 'File Upload', 'Insecure Upload Exploited!');
     } else if (fileName.endsWith('.php') || fileName.endsWith('.jsp') || fileName.endsWith('.asp')) {
-      setUploadStatus(`Warning: Executable file "${profileImage.name}" uploaded! This could be dangerous. FLAG{FILE_EXECUTION_RISK}`);
+      setUploadStatus(`Warning: Executable file "${profileImage.name}" uploaded! This could be dangerous. FL4G{F1L3_3X3CUT10N_R15K}`);
+      showFlagNotification('FL4G{F1L3_3X3CUT10N_R15K}', 'File Upload', 'Executable File Upload!');
     } else if (fileName.endsWith('.sh') || fileName.endsWith('.bat') || fileName.endsWith('.exe')) {
-      setUploadStatus(`Script file "${profileImage.name}" uploaded successfully. Potential security risk detected.`);
+      setUploadStatus(`Script file "${profileImage.name}" uploaded successfully. Potential security risk detected. FL4G{5CR1PT_UPL04D}`);
+      showFlagNotification('FL4G{5CR1PT_UPL04D}', 'File Upload', 'Script Upload Detected!');
     } else {
       setUploadStatus(`Profile image "${profileImage.name}" uploaded successfully.`);
     }
@@ -135,7 +140,7 @@ export default function Profile() {
               </p>
               {hintsVisible && (
                 <div className="mt-1 text-xs text-red-400 opacity-75">
-                  ⚠ File validation insufficient
+                  File validation insufficient
                 </div>
               )}
             </div>
@@ -179,25 +184,6 @@ export default function Profile() {
             )}
           </div>
         </div>
-
-        {/* Vulnerability Info */}
-        {hintsVisible && (
-          <div className="card bg-red-900/20 border-red-500 mb-6">
-            <h3 className="text-lg font-semibold text-red-400 mb-3">◐ File Upload Vulnerability</h3>
-            <div className="text-sm text-red-300 space-y-2">
-              <p>This upload system is intentionally vulnerable:</p>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>No proper file type validation</li>
-                <li>No file content inspection</li>
-                <li>Weak filename filtering</li>
-                <li>No size restrictions</li>
-              </ul>
-              <p className="text-xs text-red-400 mt-3">
-                Try uploading files with names like "flag.txt", "admin.php", or "script.sh"
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Account Actions */}
         <div className="card">

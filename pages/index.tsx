@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useHints } from '../contexts/HintContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 export default function Home() {
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState('');
+  const [xssTriggered, setXssTriggered] = useState(false);
   const { hintsVisible } = useHints();
+  const { showFlagNotification } = useNotifications();
   const searchResultsRef = useRef<HTMLDivElement>(null);
 
   const products = [
@@ -40,18 +43,36 @@ export default function Home() {
   ];
 
   const handleSearch = () => {
+    // Reset XSS flag if search is cleared
+    if (search.trim() === '') {
+      setXssTriggered(false);
+      setSearchResults('');
+      return;
+    }
+
     // XSS Vulnerability - Direct HTML injection without ANY sanitization
-    const matchingProducts = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).length;
+    const matchingProducts = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     
     // Real XSS vulnerability - directly inserting user input into HTML
     // This will actually execute JavaScript when using event handlers
-    setSearchResults(`<div>
-      <p>Search results for: <strong>${search}</strong></p>
-      <p>Found ${matchingProducts} products matching your query</p>
-      <div style="margin-top: 10px; padding: 8px; background: rgba(255,122,0,0.1); border-left: 3px solid #ff7a00;">
-        Raw Query: ${search}
-      </div>
-    </div>`);
+    if (matchingProducts.length > 0) {
+      const productList = matchingProducts.map(p => 
+        `<div style="margin: 8px 0; padding: 8px; background: rgba(255,122,0,0.1); border-radius: 4px;">
+          <strong>${p.name}</strong> - $${p.price}
+        </div>`
+      ).join('');
+      
+      setSearchResults(`<div>
+        <p>Search results for: <strong>${search}</strong></p>
+        <p>Found ${matchingProducts.length} products matching your query</p>
+        ${productList}
+      </div>`);
+    } else {
+      setSearchResults(`<div>
+        <p>Search results for: <strong>${search}</strong></p>
+        <p>Found 0 products matching your query</p>
+      </div>`);
+    }
   };
 
   // Additional XSS vector - this useEffect will execute any script tags in the search results
@@ -65,8 +86,14 @@ export default function Home() {
         document.body.appendChild(newScript);
         document.body.removeChild(newScript);
       });
+
+      // Check for XSS attempts and show flag notification (only once)
+      if (!xssTriggered && (search.includes('<script>') || search.includes('<img') || search.includes('onerror') || search.includes('onload'))) {
+        setXssTriggered(true);
+        showFlagNotification('FL4G{X55_F0UND}', 'XSS', 'XSS Vulnerability Exploited!');
+      }
     }
-  }, [searchResults]);
+  }, [searchResults, search, showFlagNotification, xssTriggered]);
 
   return (
     <div className="min-h-screen">
@@ -108,37 +135,12 @@ export default function Home() {
             {/* Subtle hint when hint mode is on */}
             {hintsVisible && (
               <div className="mt-2 text-xs text-red-400 opacity-75">
-                ⚠ Input not sanitized - Try: &lt;script&gt;alert('REAL_XSS')&lt;/script&gt; or &lt;img src=x onerror=alert('XSS')&gt;
+                Input not sanitized - Try: &lt;script&gt;alert('REAL_XSS')&lt;/script&gt; or &lt;img src=x onerror=alert('XSS')&gt;
               </div>
             )}
           </div>
         </div>
       </section>
-
-      {/* XSS Testing Section - Only visible in hint mode */}
-      {hintsVisible && (
-        <section className="py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="card bg-red-900/20 border-red-500">
-              <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ XSS Testing</h3>
-              <p className="text-sm text-red-300 mb-2">
-                The search functionality is vulnerable to XSS. Try these REAL working payloads:
-              </p>
-              <ul className="text-sm text-red-300 list-disc pl-4 space-y-1">
-                <li><code>&lt;script&gt;alert('REAL_XSS_EXECUTION')&lt;/script&gt;</code></li>
-                <li><code>&lt;img src=x onerror=alert('XSS_SUCCESS')&gt;</code></li>
-                <li><code>&lt;svg onload=alert('FLAG&#123;XSS_FOUND&#125;')&gt;</code></li>
-                <li><code>&lt;iframe src=javascript:alert('XSS')&gt;&lt;/iframe&gt;</code></li>
-                <li><code>&lt;details open ontoggle=alert('XSS')&gt;&lt;/details&gt;</code></li>
-                <li><code>&lt;marquee onstart=alert('XSS')&gt;test&lt;/marquee&gt;</code></li>
-              </ul>
-              <p className="text-xs text-red-400 mt-2">
-                This implements REAL XSS - both event handlers AND script tag execution via useEffect!
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Products Grid */}
       <section className="py-16 px-6">
@@ -177,7 +179,7 @@ export default function Home() {
                 </div>
                 {hintsVisible && (
                   <div className="mt-2 text-xs text-blue-400 opacity-75">
-                    ⚠ Product ID: {product.id}
+                    Product ID: {product.id}
                   </div>
                 )}
               </Link>
@@ -185,27 +187,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Security Notice */}
-      {hintsVisible && (
-        <section className="py-8 px-6 bg-hacksmith-gray">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="card bg-red-900/20 border-red-500">
-              <h3 className="text-lg font-semibold text-red-400 mb-3">⚠ Security Notice</h3>
-              <p className="text-sm text-red-300">
-                This application contains intentional vulnerabilities for educational purposes:
-              </p>
-              <ul className="text-sm text-red-300 mt-2 space-y-1">
-                <li>• XSS vulnerability in search functionality</li>
-                <li>• SQL injection in login system</li>
-                <li>• IDOR vulnerability in product URLs</li>
-                <li>• LFI vulnerability in product details</li>
-                <li>• File upload vulnerabilities</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
