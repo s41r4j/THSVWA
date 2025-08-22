@@ -106,7 +106,7 @@ export default function Terms() {
             </h2>
             <div className="space-y-4 text-gray-300">
               <p>
-                This application is provided "as is" for educational purposes only. By using this application, you acknowledge 
+                This application is provided &quot;as is&quot; for educational purposes only. By using this application, you acknowledge
                 and agree to the following:
               </p>
               <ul className="list-disc pl-6 space-y-2">

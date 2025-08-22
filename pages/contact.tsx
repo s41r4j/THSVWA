@@ -166,7 +166,7 @@ export default function Contact() {
                 </p>
                 
                 <p>
-                  <strong>No Warranty:</strong> This software is provided "as is" without warranty. 
+                  <strong>No Warranty:</strong> This software is provided &quot;as is&quot; without warranty.
                   Users assume all risks associated with its use.
                 </p>
               </div>

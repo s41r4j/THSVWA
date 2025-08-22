@@ -148,7 +148,7 @@ export default function Login() {
               />
               {hintsVisible && (
                 <div className="mt-1 text-xs text-orange-400 opacity-75">
-                  💡 SQL Injection: Try ' OR 1=1 --, admin' OR '1'='1' --, or admin'#
+                  💡 SQL Injection: Try &apos; OR 1=1 --, admin&apos; OR &apos;1&apos;=&apos;1&apos; --, or admin&apos;#
                 </div>
               )}
             </div>
@@ -184,7 +184,7 @@ export default function Login() {
               </div>
               {hintsVisible && (
                 <div className="mt-1 text-xs text-yellow-400 opacity-75">
-                  💡 SQL Injection also works in password field: ' OR 1=1 --
+                  💡 SQL Injection also works in password field: &apos; OR 1=1 --
                 </div>
               )}
             </div>

@@ -78,24 +78,33 @@ export default function Home() {
       return;
     }
 
-    // XSS Vulnerability - Direct HTML injection without ANY sanitization
-    const matchingProducts = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-    
-    // Real XSS vulnerability - directly inserting user input into HTML
-    // This will actually execute JavaScript when using event handlers
+    // More realistic XSS: vulnerable search term highlighting
+    // Filter based on a "cleaned" version of the search term
+    const cleanSearch = search.replace(/<[^>]*>?/gm, '');
+    const matchingProducts = cleanSearch ? products.filter(p =>
+      p.name.toLowerCase().includes(cleanSearch.toLowerCase())
+    ) : [];
+
+    // The vulnerability is now in the highlighting, which uses the raw search term
     if (matchingProducts.length > 0) {
-      const productList = matchingProducts.map(p => 
-        `<div style="margin: 8px 0; padding: 8px; background: rgba(255,122,0,0.1); border-radius: 4px;">
-          <strong>${p.name}</strong> - $${p.price}
-        </div>`
-      ).join('');
-      
+      const productList = matchingProducts.map(p => {
+        // Vulnerable highlighting: inject the raw search term on match
+        const highlightedName = p.name.replace(
+          new RegExp(cleanSearch, 'ig'),
+          `<span class="bg-yellow-400 text-black">${search}</span>`
+        );
+        return `<div style="margin: 8px 0; padding: 8px; background: rgba(255,122,0,0.1); border-radius: 4px;">
+                  <strong>${highlightedName}</strong> - $${p.price}
+                </div>`;
+      }).join('');
+
       setSearchResults(`<div>
         <p>Search results for: <strong>${search}</strong></p>
         <p>Found ${matchingProducts.length} products matching your query</p>
         ${productList}
       </div>`);
     } else {
+      // If no products match, still reflect the search term, but it's less of a "real" feature
       setSearchResults(`<div>
         <p>Search results for: <strong>${search}</strong></p>
         <p>Found 0 products matching your query</p>
@@ -163,7 +172,7 @@ export default function Home() {
             {/* Subtle hint when hint mode is on */}
             {hintsVisible && (
               <div className="mt-2 text-xs text-red-400 opacity-75">
-                Input not sanitized - Try: &lt;script&gt;alert('REAL_XSS')&lt;/script&gt; or &lt;img src=x onerror=alert('XSS')&gt;
+                Input not sanitized - Try: &lt;script&gt;alert(&apos;REAL_XSS&apos;)&lt;/script&gt; or &lt;img src=x onerror=alert(&apos;XSS&apos;)&gt;
               </div>
             )}
           </div>
